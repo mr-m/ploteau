@@ -34,6 +34,7 @@
                     var dx = ev.clientX - sx;
                     var dy = ev.clientY - sy;
                     cube.rotation.y += dx * 0.01;
+                    cube.rotation.x += dy * 0.01;
                     sx += dx;
                     sy += dy;
                 }
@@ -41,10 +42,6 @@
 
             function render() {
                 requestAnimationFrame(render);
-
-                cube.rotation.x += 0.02;
-                cube.rotation.y += 0.01;
-
                 renderer.render(scene, camera);
             }
             render();
