@@ -1,32 +1,19 @@
-// Setting the FPS-counter
-
-var stats = new Stats();
-stats.setMode(0); // 0: fps, 1: ms
-
-// Align top-left
-stats.domElement.style.position = 'absolute';
-stats.domElement.style.right = '0px';
-stats.domElement.style.top = '0px';
-
-document.body.appendChild( stats.domElement );
-
-setInterval( function () {
-
-    stats.begin();
-
-    // your code goes here
-
-    stats.end();
-
-}, 1000 / 60 );
-
-
-
-
-// create a parser
-var parser = math.parser();
+var settings_panel = document.getElementById("settings");
 
 var function_field = document.getElementById("function");
+
+var meter = new FPSMeter(
+    settings_panel,
+    {
+        theme: 'light',
+        position: "relative",
+        left: "0em",
+        right: "0em",
+        graph: 1,
+        history: 20
+    });
+
+var parser = math.parser();
 
 var f = function (x, y) { return x + y; }
 
@@ -46,24 +33,9 @@ var get_function = function () {
     console.log("'get_function' work done");
 }
 
-function_field.addEventListener("change", function () {
-    console.log("'function_field.onchange' event appeared");
-    get_function();
-    get_values(XX, YY, f);
-    console.log("'function_field.onchange' event handler work done");
-});
-
-get_function();
-
 var get_boundaries = function () {
 
 }
-
-
-XX = [-5,-4,-3,-2,-1, 0, 1, 2, 3, 4, 5];
-YY = [-5,-4,-3,-2,-1, 0, 1, 2, 3, 4, 5];
-ZZ = [];
-
 
 var get_values = function (x_nodes, y_nodes, fun) {
 
@@ -81,10 +53,27 @@ var get_values = function (x_nodes, y_nodes, fun) {
     return z_values;
 }
 
-ZZ = get_values(XX, YY, f)
+function_field.addEventListener("change", function () {
+    console.log("'function_field.onchange' event appeared");
+    get_function();
+    ZZ = get_values(XX, YY, f);
 
-// Структура, описывающая сплайн на каждом сегменте сетки
-splines = [];
+    particles.vertices.length = 0;
+    get_x_aligned_splines(XX, YY, ZZ);
+    get_y_aligned_splines(XX, YY, ZZ);
+
+    console.log("'function_field.onchange' event handler work done");
+});
+
+get_function();
+
+
+XX = [-5,-4,-3,-2,-1, 0, 1, 2, 3, 4, 5];
+YY = [-5,-4,-3,-2,-1, 0, 1, 2, 3, 4, 5];
+ZZ = [];
+
+
+ZZ = get_values(XX, YY, f)
 
 var scene    = new THREE.Scene();
 var camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -111,51 +100,57 @@ var particles = new THREE.Geometry(),
         });
 
 
+var get_x_aligned_splines = function (x_nodes, y_nodes, z_values) {
+    for (var i = 0; i < y_nodes.length; i++) {
+        BuildSpline(x_nodes, z_values[i], x_nodes.length);
+        var pos = x_nodes[0];
+        // now create the individual particles
+        while (pos <= x_nodes[x_nodes.length - 1]) {
+            // create a particle with random
+            // position values, -250 -> 250
+            var pX = pos,
+                pY = y_nodes[i],
+                pZ = Interpolate(pos),
+                particle = new THREE.Vector3(pX, pY, pZ);
 
-for (var i = 0; i < XX.length; i++) {
-    BuildSpline(YY, ZZ[i], YY.length);
-    var pos = YY[0];
-    // now create the individual particles
-    while (pos <= YY[YY.length - 1]) {
-        // create a particle with random
-        // position values, -250 -> 250
-        var pX = XX[i],
-            pY = pos,
-            pZ = Interpolate(pos),
-            particle = new THREE.Vector3(pX, pY, pZ);
+            // add it to the geometry
+            particles.vertices.push(particle);
 
-        // add it to the geometry
-        particles.vertices.push(particle);
-
-        pos += 0.1;
-    }
-};
-
-for (var i = 0; i < YY.length; i++) {
-
-    var ar = [];
-
-    for (var j = 0; j < XX.length; j++) {
-        ar[j] = ZZ[j][i];
+            pos += 0.1;
+        }
     };
+}
 
-    BuildSpline(XX, ar, XX.length);
-    var pos = YY[0];
-    // now create the individual particles
-    while (pos <= YY[YY.length - 1]) {
-        // create a particle with random
-        // position values, -250 -> 250
-        var pX = pos,
-            pY = YY[i],
-            pZ = Interpolate(pos),
-            particle = new THREE.Vector3(pX, pY, pZ);
+var get_y_aligned_splines = function (x_nodes, y_nodes, z_values) {
+    for (var i = 0; i < x_nodes.length; i++) {
+        var ar = [];
 
-        // add it to the geometry
-        particles.vertices.push(particle);
+        for (var j = 0; j < y_nodes.length; j++) {
+            ar[j] = z_values[j][i];
+        };
 
-        pos += 0.1;
-    }
-};
+        BuildSpline(y_nodes, ar, y_nodes.length);
+        var pos = y_nodes[0];
+        // now create the individual particles
+        while (pos <= y_nodes[y_nodes.length - 1]) {
+            // create a particle with random
+            // position values, -250 -> 250
+            var pX = x_nodes[i],
+                pY = pos,
+                pZ = Interpolate(pos),
+                particle = new THREE.Vector3(pX, pY, pZ);
+
+            // add it to the geometry
+            particles.vertices.push(particle);
+
+            pos += 0.1;
+        }
+    };
+}
+
+particles.vertices.length = 0;
+get_x_aligned_splines(XX, YY, ZZ);
+get_y_aligned_splines(XX, YY, ZZ);
 
 // create the particle system
 var particleSystem =
@@ -195,5 +190,6 @@ window.onmousemove = function (ev) {
 function render() {
     requestAnimationFrame(render);
     renderer.render(scene, camera);
+    meter.tick();
 }
 render();
