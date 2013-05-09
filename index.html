@@ -1,53 +1,89 @@
 <html>
     <head>
         <title>Test mode</title>
-        <style>html, body { margin: 0; }</style>
+        <link rel="stylesheet" type="text/css" href="/plateau.css" />
     </head>
     <body>
-        <script src="https://raw.github.com/mrdoob/three.js/master/build/three.min.js"></script>
-        <script>
-            var scene    = new THREE.Scene();
-            var camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            var renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            var geometry = new THREE.CubeGeometry(2,2,2);
-            var material = new THREE.MeshPhongMaterial({color: 0xFF0000, wireframe: true, wireframeLinewidth: 3.0});
-            var cube     = new THREE.Mesh(geometry, material);
-            scene.add(cube);
-
-            camera.position.z = 5;
-
-            var light = new THREE.SpotLight();
-            light.position.set(10, 10, 10);
-            scene.add(light);
-
-            var down = false;
-            var sx = 0, sy = 0;
-            window.onmousedown = function (ev) {
-                down = true; sx = ev.clientX; sy = ev.clientY;
-            };
-            window.onmouseup = function () { down = false; };
-            window.onmousemove = function (ev) {
-                if (down) {
-                    var dx = ev.clientX - sx;
-                    var dy = ev.clientY - sy;
-                    cube.rotation.y += dx * 0.01;
-                    sx += dx;
-                    sy += dy;
-                }
-            }
-
-            function render() {
-                requestAnimationFrame(render);
-
-                cube.rotation.x += 0.02;
-                cube.rotation.y += 0.01;
-
-                renderer.render(scene, camera);
-            }
-            render();
-        </script>
+        <div>
+            <div class="container" id="settings">
+                <form action=".">
+                    <div>
+                        <h3>Функция</h3>
+                        <label for="function">Функция</label>
+                        <input type="text" name="function" id="function" value="cos(x) * cos(y)">
+                    </div>
+                    <div>
+                        <h3>Тип графика</h3>
+                        <div>
+                            <input type="radio" name="plot" value="cubic" id="cubic">
+                            <label for="cubic">Кубическая интерполяция</label>
+                        </div>
+                        <div>
+                            <input type="radio" name="plot" value="bicubic" id="bicubic" checked="checked">
+                            <label for="bicubic">Бикубическая интерполяция</label>
+                        </div>
+                        <div>
+                            <input type="radio" name="plot" value="triangulation" id="triangulation">
+                            <label for="triangulation">Триангуляция</label>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Тип сетки</h3>
+                        <div>
+                            <input type="radio" name="grid" value="regular" id="regular" checked="checked">
+                            <label for="regular">Регулярная</label>
+                        </div>
+                        <div>
+                            <input type="radio" name="grid" value="user-defined" id="user-defined">
+                            <label for="user-defined">Произвольная</label>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Границы построения</h3>
+                        <div>
+                            <h4>По оси X</h4>
+                            <div>
+                                <label for="x_lower_boundary">Нижняя граница по оси X</label>
+                                <input type="text" name="x_lower_boundary" id="x_lower_boundary" title="Нижняя граница по оси X" value="-10">
+                            </div>
+                            <div>
+                                <label for="x_upper_boundary">Верхняя граница по оси X</label>
+                                <input type="text" name="x_upper_boundary" id="x_upper_boundary" title="Верхняя граница по оси X" value="10">
+                            </div>
+                        </div>
+                        <div>
+                            <h4>По оси X</h4>
+                            <div>
+                                <label for="y_lower_boundary">Нижняя граница по оси Y</label>
+                                <input type="text" name="y_lower_boundary" id="y_lower_boundary" title="Нижняя граница по оси Y" value="-10">
+                            </div>
+                            <div>
+                                <label for="y_upper_boundary">Верхняя граница по оси Y</label>
+                                <input type="text" name="y_upper_boundary" id="y_upper_boundary" title="Верхняя граница по оси Y" value="10">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Количество узлов</h3>
+                        <div>
+                            <label for="x_node_count">По оси X</label>
+                            <input type="text" name="x_node_count" id="x_node_count" title="По оси X" value="50">
+                        </div>
+                        <div>
+                            <label for="y_node_count">По оси Y</label>
+                            <input type="text" name="y_node_count" id="y_node_count" title="По оси Y" value="50">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="container" id="render">
+            </div>
+        </div>
+        <script src="//raw.github.com/mrdoob/three.js/master/build/three.min.js"></script>
+        <script src="//raw.github.com/josdejong/mathjs/master/math.min.js"></script>
+        <script src="//raw.github.com/andrewplummer/Sugar/master/release/sugar.min.js"></script>
+        <script src="//raw.github.com/Darsain/fpsmeter/master/dist/fpsmeter.min.js"></script>
+        <script src="plateau.js"></script>
+        <script src="main.js"></script>
     </body>
 </html>
