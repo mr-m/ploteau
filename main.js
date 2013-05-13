@@ -21,11 +21,31 @@ var meter = new FPSMeter(
         history: 20
     });
 
+var x_lower_boundary;
+var x_upper_boundary;
+var y_lower_boundary;
+var y_upper_boundary;
+
+var x_node_count;
+var y_node_count;
+
 var f = function (x, y) { return x + y; }
+
+var x_coordinates = [];
+var y_coordinates = [];
+
+var values = [];
+
+var interpolant = new CubicInterpolant();
 
 var get_value = function (field) {
     var field_value = field.value;
     return field_value;
+}
+
+var get_number = function (field) {
+    var field_value_as_number = get_value(field).toNumber();
+    return field_value_as_number;
 }
 
 var get_function = function (field) {
@@ -49,10 +69,10 @@ var get_function = function (field) {
 var get_boundaries = function () {
     console.log("'get_boundaries' called");
 
-    x_lower_boundary = get_value(x_lower_boundary_field).toNumber();
-    x_upper_boundary = get_value(x_upper_boundary_field).toNumber();
-    y_lower_boundary = get_value(y_lower_boundary_field).toNumber();
-    y_upper_boundary = get_value(y_upper_boundary_field).toNumber();
+    x_lower_boundary = get_number(x_lower_boundary_field);
+    x_upper_boundary = get_number(x_upper_boundary_field);
+    y_lower_boundary = get_number(y_lower_boundary_field);
+    y_upper_boundary = get_number(y_upper_boundary_field);
 
     console.log("x:[" + x_lower_boundary + ", " + x_upper_boundary + "]");
     console.log("y:[" + y_lower_boundary + ", " + y_upper_boundary + "]");
@@ -63,8 +83,8 @@ var get_boundaries = function () {
 var get_nodes_count = function () {
     console.log("'get_nodes_count' called");
 
-    x_node_count = get_value(x_node_count_field);
-    y_node_count = get_value(y_node_count_field);
+    x_node_count = get_number(x_node_count_field);
+    y_node_count = get_number(y_node_count_field);
 
     console.log("x: " + x_node_count);
     console.log("y: " + y_node_count);
@@ -72,17 +92,19 @@ var get_nodes_count = function () {
     console.log("'get_nodes_count' work done");
 }
 
-var get_nodes = function (lower_boundary, upper_boundary, regions_count) {
+var get_nodes = function (lower_boundary, upper_boundary, nodes_count) {
     console.log("'get_nodes' called");
 
     var nodes = [];
+
+    var regions_count = nodes_count - 1;
 
     for (var i = 0; i <= regions_count; i++) {
         var value = lower_boundary + ((upper_boundary - lower_boundary) / regions_count) * i;
         nodes[i] = value;
     };
 
-    console.log(nodes);
+    // console.log(nodes);
 
     console.log("'get_nodes' work done");
 
@@ -92,81 +114,67 @@ var get_nodes = function (lower_boundary, upper_boundary, regions_count) {
 var get_values = function (x_nodes, y_nodes, fun) {
     console.log("'get_values' called");
 
-    var z_values = [];
+    var values = [];
 
     for (var i = 0; i < y_nodes.length; i++) {
 
-        z_values[i] = [];
+        var y = y_nodes[i];
+
+        values[i] = [];
 
         for (var j = 0; j < x_nodes.length; j++) {
-            z_values[i][j] = fun(x_nodes[j], y_nodes[i]);
+            var x = x_nodes[j];
+
+            var z = fun(x, y);
+
+            values[i][j] = new THREE.Vector3(x, y, z);
         }
     }
 
-    console.log(z_values);
+    // console.log(values);
 
     console.log("'get_values' work done");
 
-    return z_values;
+    return values;
 }
 
-var get_x_aligned_splines = function (x_nodes, y_nodes, z_values) {
+var get_vertices = function (nodes, markup) {
+    console.log("'get_vertices' called");
+
+    var floating = markup.floating || 'x';
+    var fixed    = markup.fixed    || 'y';
+    var value    = markup.value    || 'z';
+
     var vertices = []
 
-    for (var i = 0; i < y_nodes.length; i++) {
-        var ar = z_values[i];
+    var nodes_along = nodes.flatten().sortBy(floating).groupBy(fixed);
 
-        BuildSpline(x_nodes, ar, x_nodes.length);
+    // console.log(nodes_along);
 
-        var pos = x_nodes[0];
+    for (var fixed_coordinate in nodes_along) {
+        // console.log(fixed_coordinate);
+        // console.log(nodes_along[fixed_coordinate]);
 
-        while (pos <= x_nodes[x_nodes.length - 1]) {
-            var pX = pos,
-                pY = y_nodes[i],
-                pZ = Interpolate(pos),
+        var current_nodes = nodes_along[fixed_coordinate];
+
+        interpolant.Build(current_nodes, {node: floating, value: value});
+
+        var floating_position = current_nodes[0][floating];
+        var fixed_position    = fixed_coordinate.toNumber();
+
+        while (floating_position <= current_nodes[current_nodes.length - 1][floating]) {
+            var pX = (fixed === 'x') ? fixed_position : floating_position,
+                pY = (fixed === 'y') ? fixed_position : floating_position,
+                pZ = interpolant.Interpolate(floating_position),
                 particle = new THREE.Vector3(pX, pY, pZ);
 
             vertices.push(particle);
 
-            pos += 0.1;
+            floating_position += 0.1;
         }
-    };
-    return vertices;
-}
+    }
 
-var get_y_aligned_splines = function (x_nodes, y_nodes, z_values) {
-    var vertices = []
-
-    for (var i = 0; i < x_nodes.length; i++) {
-        var ar = [];
-
-        for (var j = 0; j < y_nodes.length; j++) {
-            ar[j] = z_values[j][i];
-        };
-
-        BuildSpline(y_nodes, ar, y_nodes.length);
-
-        var pos = y_nodes[0];
-
-        while (pos <= y_nodes[y_nodes.length - 1]) {
-            var pX = x_nodes[i],
-                pY = pos,
-                pZ = Interpolate(pos),
-                particle = new THREE.Vector3(pX, pY, pZ);
-
-            vertices.push(particle);
-
-            pos += 0.1;
-        }
-    };
-    return vertices;
-}
-
-var get_particles = function (x_nodes, y_nodes, z_values) {
-    var vertices = [];
-
-    vertices.add(get_x_aligned_splines(x_nodes, y_nodes, z_values));
-    vertices.add(get_y_aligned_splines(x_nodes, y_nodes, z_values));
+    console.log("'get_vertices' work done");
 
     return vertices;
 }
@@ -186,9 +194,13 @@ var B_change = function () {
 
     f = get_function(function_field);
 
-    XX = get_nodes(x_lower_boundary, x_upper_boundary, x_node_count);
-    YY = get_nodes(y_lower_boundary, y_upper_boundary, y_node_count);
-    ZZ = get_values(XX, YY, f);
+    x_coordinates = get_nodes(x_lower_boundary, x_upper_boundary, x_node_count);
+    console.log(x_coordinates);
+
+    y_coordinates = get_nodes(y_lower_boundary, y_upper_boundary, y_node_count);
+    console.log(y_coordinates);
+
+    values = get_values(x_coordinates, y_coordinates, f);
 
     console.log("'B_change' event handler work done");
     C_change();
@@ -197,8 +209,16 @@ var B_change = function () {
 var C_change = function () {
     console.log("'C_change' event appeared");
 
-    particles.vertices.length = 0;
-    particles.vertices.add(get_particles(XX, YY, ZZ));
+    particles.dispose();
+
+    particles = new THREE.Geometry();
+    particleSystem = new THREE.ParticleSystem(particles, material);
+    scene.add(particleSystem);
+
+    console.log(particles);
+
+    particles.vertices.add(get_vertices(values, {fixed: 'y', floating: 'x', value: 'z'}));
+    particles.vertices.add(get_vertices(values, {fixed: 'x', floating: 'y', value: 'z'}));
 
     console.log("'C_change' event handler work done");
 }
@@ -216,6 +236,7 @@ function_field.addEventListener("change", B_change);
 var scene    = new THREE.Scene();
 var camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 var renderer = new THREE.WebGLRenderer();
+
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("render").appendChild(renderer.domElement);
 
@@ -229,20 +250,15 @@ var axes = new THREE.AxisHelper(10);
 scene.add(axes);
 
 // create the particle variables
-var particles = new THREE.Geometry(),
-    pMaterial =
-        new THREE.ParticleBasicMaterial({
-            color: 0xFFAAAA,
-            size: 0.1,
-            transparent: true
-        });
+var particles = new THREE.Geometry();
+var material = new THREE.ParticleBasicMaterial({
+    color: 0xFFAAAA,
+    size: 0.1,
+    transparent: true
+});
 
 // create the particle system
-var particleSystem =
-    new THREE.ParticleSystem(
-        particles,
-        pMaterial
-    );
+var particleSystem = new THREE.ParticleSystem(particles, material);
 
 particleSystem.sortParticles = true;
 
