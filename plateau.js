@@ -19,13 +19,8 @@ function CubicInterpolant () {
     var splines = [];
 
     // Построение сплайна
-    self.Build = function (nodes, markup)
+    self.Build = function (nodes)
     {
-        markup = markup || {};
-
-        var node  = markup.node;
-        var value = markup.value;
-
         var n = nodes.length;
 
         // Инициализация массива сплайнов
@@ -34,8 +29,8 @@ function CubicInterpolant () {
         }
         for (var i = 0; i < n; ++i)
         {
-            splines[i].x = nodes[i][node];
-            splines[i].a = nodes[i][value];
+            splines[i].x = nodes[i].position;
+            splines[i].a = nodes[i].value;
         }
         splines[0].c = splines[n - 1].c = 0.0;
 
@@ -46,12 +41,12 @@ function CubicInterpolant () {
         alpha[0] = beta[0] = 0.0;
         for (var i = 1; i < n - 1; ++i)
         {
-            var hi  = nodes[i][node] - nodes[i - 1][node];
-            var hi1 = nodes[i + 1][node] - nodes[i][node];
+            var hi  = nodes[i].position - nodes[i - 1].position;
+            var hi1 = nodes[i + 1].position - nodes[i].position;
             var A = hi;
             var C = 2.0 * (hi + hi1);
             var B = hi1;
-            var F = 6.0 * ((nodes[i + 1][value] - nodes[i][value]) / hi1 - (nodes[i][value] - nodes[i - 1][value]) / hi);
+            var F = 6.0 * ((nodes[i + 1].value - nodes[i].value) / hi1 - (nodes[i].value - nodes[i - 1].value) / hi);
             var z = (A * alpha[i - 1] + C);
             alpha[i] = -B / z;
             beta[i] = (F - A * beta[i - 1]) / z;
@@ -66,9 +61,9 @@ function CubicInterpolant () {
         // По известным коэффициентам c[i] находим значения b[i] и d[i]
         for (var i = n - 1; i > 0; --i)
         {
-            var hi = nodes[i][node] - nodes[i - 1][node];
+            var hi = nodes[i].position - nodes[i - 1].position;
             splines[i].d = (splines[i].c - splines[i - 1].c) / hi;
-            splines[i].b = hi * (2.0 * splines[i].c + splines[i - 1].c) / 6.0 + (nodes[i][value] - nodes[i - 1][value]) / hi;
+            splines[i].b = hi * (2.0 * splines[i].c + splines[i - 1].c) / 6.0 + (nodes[i].value - nodes[i - 1].value) / hi;
         }
     }
 
