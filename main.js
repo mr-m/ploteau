@@ -286,10 +286,19 @@ window.onmousemove = function (ev) {
         var dy = ev.clientY - sy;
 
         particleSystem.rotation.z += dx * 0.01;
-        particleSystem.rotation.x += dy * 0.01;
-
         axes.rotation.z += dx * 0.01;
-        axes.rotation.x += dy * 0.01;
+
+        var new_angle = axes.rotation.x + dy * 0.01;
+
+        if (new_angle > 0) {
+            new_angle = 0;
+        }
+
+        if (new_angle < -math.pi) {
+            new_angle = -math.pi;
+        }
+
+        particleSystem.rotation.x = axes.rotation.x = new_angle;
 
         sx += dx;
         sy += dy;
