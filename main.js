@@ -168,7 +168,25 @@ var get_vertices = function (nodes, markup) {
 
         var current_nodes = nodes_along[fixed_coordinate];
 
-        interpolant.Build(current_nodes, {node: floating, value: value});
+        var nodes_coordinates_only = current_nodes.clone();
+
+        for (var i = 0; i < nodes_coordinates_only.length; i++) {
+            var el = nodes_coordinates_only[i];
+
+            var new_element = Object.select(el, [floating, value]);
+
+            new_element.position = new_element[floating];
+            new_element.value    = new_element[value];
+
+            delete new_element[floating];
+            delete new_element[value];
+
+            nodes_coordinates_only[i] = new_element;
+        }
+
+        console.log(nodes_coordinates_only);
+
+        interpolant.Build(nodes_coordinates_only);
 
         var floating_position = current_nodes[0][floating];
         var fixed_position    = fixed_coordinate.toNumber();
