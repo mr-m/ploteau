@@ -48,22 +48,21 @@ var get_number = function (field) {
     return field_value_as_number;
 }
 
-var get_function = function (field) {
+var get_function = function (function_string) {
     console.log("'get_function' called");
 
-    var field_value = get_value(field);
-    var str = 'function f(x, y) = ' + field_value;
+    var str = 'function f(x, y) = ' + function_string;
 
-    console.log("string given in the field: '" + field_value + "'");
+    console.log("string itself: '" + function_string + "'");
     console.log("string given to the parser: '" + str + "'");
 
     var parser = math.parser();
-
     parser.eval(str);
+    var fun = parser.get('f');
 
     console.log("'get_function' work done");
 
-    return parser.get("f");
+    return fun;
 }
 
 var get_title = function (function_string) {
@@ -204,8 +203,8 @@ var A_change = function () {
 var B_change = function () {
     console.log("'B_change' event appeared");
 
-    f = get_function(function_field);
     var function_string = get_value(function_field);
+    f = get_function(function_string);
     document.title = get_title(function_string);
 
     x_coordinates = get_nodes(x_lower_boundary, x_upper_boundary, x_node_count);
