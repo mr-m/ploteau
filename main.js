@@ -242,8 +242,12 @@ var C_change = function () {
 
     particles.dispose();
 
+    scene.remove(particleSystem);
+
     particles = new THREE.Geometry();
     particleSystem = new THREE.ParticleSystem(particles, material);
+
+    particleSystem.rotation.set(axes.rotation.x, axes.rotation.y, axes.rotation.z);
     scene.add(particleSystem);
 
     console.log(particles);
