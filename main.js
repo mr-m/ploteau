@@ -66,6 +66,18 @@ var get_function = function (field) {
     return parser.get("f");
 }
 
+var get_title = function (function_string) {
+    console.log("'get_title' called");
+
+    var title = function_string + ' | plateau';
+
+    console.log("new title: '" + title + "'");
+
+    console.log("'get_title' work done");
+
+    return title;
+}
+
 var get_boundaries = function () {
     console.log("'get_boundaries' called");
 
@@ -193,6 +205,8 @@ var B_change = function () {
     console.log("'B_change' event appeared");
 
     f = get_function(function_field);
+    var function_string = get_value(function_field);
+    document.title = get_title(function_string);
 
     x_coordinates = get_nodes(x_lower_boundary, x_upper_boundary, x_node_count);
     console.log(x_coordinates);
