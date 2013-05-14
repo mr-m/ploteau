@@ -269,9 +269,11 @@ var down = false;
 var sx = 0, sy = 0;
 
 window.onmousedown = function (ev) {
-    down = true;
-    sx = ev.clientX;
-    sy = ev.clientY;
+    if (ev.target == renderer.domElement) {
+        down = true;
+        sx = ev.clientX;
+        sy = ev.clientY;
+    }
 };
 
 window.onmouseup = function () {
