@@ -303,15 +303,13 @@ scene.add(particleSystem);
 var down = false;
 var sx = 0, sy = 0;
 
-window.onmousedown = function (ev) {
-    if (ev.target == renderer.domElement) {
-        down = true;
-        sx = ev.clientX;
-        sy = ev.clientY;
-    }
+renderer.domElement.onmousedown = renderer.domElement.ontouchstart = function (ev) {
+    down = true;
+    sx = ev.clientX;
+    sy = ev.clientY;
 };
 
-window.onmouseup = function () {
+window.onmouseup = renderer.domElement.ontouchend = function () {
     down = false;
 };
 
