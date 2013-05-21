@@ -31,6 +31,17 @@ var y_node_count;
 
 var f = function (x, y) { return x + y; }
 
+var random_functions = [
+    "cos(x) * cos(y)",
+    "re(asin( (i*x + y)^5 ))",
+    "im(asin( (i*x + y)^5 ))",
+    "re(asin( (i*x + y)^5 )) * im(asin( (i*x + y)^5 ))",
+    "im( (x*y)^(1/4) ) + re( (x*y)^(1/3) )",
+    "(5*x*y) / (x^2 + y^2)",
+    "(x^2 + y^2) * exp(1 - x^2 - y^2)",
+    "cos(x)/y"
+];
+
 var x_coordinates = [];
 var y_coordinates = [];
 
