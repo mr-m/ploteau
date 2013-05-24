@@ -2,6 +2,8 @@ var settings_panel = document.getElementById("settings");
 
 var function_field = document.getElementById("function");
 
+var plot_type_radio_buttons = document.getElementsByName("plot");
+
 var x_lower_boundary_field = document.getElementById("x_lower_boundary");
 var x_upper_boundary_field = document.getElementById("x_upper_boundary");
 var y_lower_boundary_field = document.getElementById("y_lower_boundary");
@@ -47,7 +49,7 @@ var y_coordinates = [];
 
 var values = [];
 
-var interpolant = new CubicInterpolant();
+var interpolant;
 
 var get_value = function (field) {
     var field_value = field.value;
@@ -206,6 +208,29 @@ var C_change = function () {
 
     console.log(particles);
 
+    var type;
+
+    for (var i = 0; i < plot_type_radio_buttons.length; ++i) {
+        if (plot_type_radio_buttons[i].checked) {
+            type = plot_type_radio_buttons[i].value;
+        }
+    }
+
+    console.log("plot_type:", type);
+
+    switch (type) {
+        default:
+        case "cubic": {
+            interpolant = new CubicInterpolant;
+        }
+        break;
+
+        case "bicubic": {
+            interpolant = new BicubicInterpolant;
+        }
+        break;
+    }
+
     particles.vertices.add(interpolant.Build(values));
 
     console.log("'C_change' event handler work done");
@@ -220,6 +245,10 @@ x_node_count_field.addEventListener("change", A_change);
 y_node_count_field.addEventListener("change", A_change);
 
 function_field.addEventListener("change", B_change);
+
+for (var i = 0; i < plot_type_radio_buttons.length; i++) {
+    plot_type_radio_buttons[i].addEventListener("change", C_change);
+}
 
 var scene    = new THREE.Scene();
 var camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
