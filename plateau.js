@@ -154,15 +154,13 @@ function CubicSpline (a, b, c, d, x) {
     this.x = x;
 }
 
-function CubicInterpolant () {
+function CubicInterpolant (nodes) {
     var self = this;
 
-    // Структура, описывающая сплайн на каждом сегменте сетки
-    var splines = [];
-
-    // Построение сплайна
     self.Build = function (nodes)
     {
+        var splines = self.splines;
+
         var   nodes_count = nodes.length;
         var splines_count = nodes_count - 1;
 
@@ -215,9 +213,21 @@ function CubicInterpolant () {
         }
     }
 
+    self.splines = [];
+
+    self.nodes = [];
+
+    if (typeof nodes !== 'undefined')
+    {
+        self.nodes = nodes;
+        self.Build(self.nodes);
+    }
+
     // Вычисление значения интерполированной функции в произвольной точке
     self.Interpolate = function (position)
     {
+        var splines = self.splines;
+
         if (splines == null)
         {
             return double.NaN; // Если сплайны ещё не построены - возвращаем NaN
