@@ -2,6 +2,8 @@ var settings_panel = document.getElementById("settings");
 
 var function_field = document.getElementById("function");
 
+var plot_type_radio_buttons = document.getElementsByName("plot");
+
 var x_lower_boundary_field = document.getElementById("x_lower_boundary");
 var x_upper_boundary_field = document.getElementById("x_upper_boundary");
 var y_lower_boundary_field = document.getElementById("y_lower_boundary");
@@ -31,12 +33,23 @@ var y_node_count;
 
 var f = function (x, y) { return x + y; }
 
+var random_functions = [
+    "cos(x) * cos(y)",
+    "re(asin( (i*x + y)^5 ))",
+    "im(asin( (i*x + y)^5 ))",
+    "re(asin( (i*x + y)^5 )) * im(asin( (i*x + y)^5 ))",
+    "im( (x*y)^(1/4) ) + re( (x*y)^(1/3) )",
+    "(5*x*y) / (x^2 + y^2)",
+    "(x^2 + y^2) * exp(1 - x^2 - y^2)",
+    "cos(x)/y"
+];
+
 var x_coordinates = [];
 var y_coordinates = [];
 
 var values = [];
 
-var interpolant = new CubicInterpolant();
+var interpolant;
 
 var get_value = function (field) {
     var field_value = field.value;
@@ -138,7 +151,9 @@ var get_values = function (x_nodes, y_nodes, fun) {
 
             var z = fun(x, y);
 
-            values[i][j] = new THREE.Vector3(x, y, z);
+            var vector_less = {x: x, y: y, z: z};
+
+            values[i][j] = vector_less;
         }
     }
 
@@ -147,65 +162,6 @@ var get_values = function (x_nodes, y_nodes, fun) {
     console.log("'get_values' work done");
 
     return values;
-}
-
-var get_vertices = function (nodes, markup) {
-    console.log("'get_vertices' called");
-
-    var floating = markup.floating || 'x';
-    var fixed    = markup.fixed    || 'y';
-    var value    = markup.value    || 'z';
-
-    var vertices = []
-
-    var nodes_along = nodes.flatten().sortBy(floating).groupBy(fixed);
-
-    // console.log(nodes_along);
-
-    for (var fixed_coordinate in nodes_along) {
-        // console.log(fixed_coordinate);
-        // console.log(nodes_along[fixed_coordinate]);
-
-        var current_nodes = nodes_along[fixed_coordinate];
-
-        var nodes_coordinates_only = current_nodes.clone();
-
-        for (var i = 0; i < nodes_coordinates_only.length; i++) {
-            var el = nodes_coordinates_only[i];
-
-            var new_element = Object.select(el, [floating, value]);
-
-            new_element.position = new_element[floating];
-            new_element.value    = new_element[value];
-
-            delete new_element[floating];
-            delete new_element[value];
-
-            nodes_coordinates_only[i] = new_element;
-        }
-
-        console.log(nodes_coordinates_only);
-
-        interpolant.Build(nodes_coordinates_only);
-
-        var floating_position = current_nodes[0][floating];
-        var fixed_position    = fixed_coordinate.toNumber();
-
-        while (floating_position <= current_nodes[current_nodes.length - 1][floating]) {
-            var pX = (fixed === 'x') ? fixed_position : floating_position,
-                pY = (fixed === 'y') ? fixed_position : floating_position,
-                pZ = interpolant.Interpolate(floating_position),
-                particle = new THREE.Vector3(pX, pY, pZ);
-
-            vertices.push(particle);
-
-            floating_position += 0.1;
-        }
-    }
-
-    console.log("'get_vertices' work done");
-
-    return vertices;
 }
 
 var A_change = function () {
@@ -252,8 +208,30 @@ var C_change = function () {
 
     console.log(particles);
 
-    particles.vertices.add(get_vertices(values, {fixed: 'y', floating: 'x', value: 'z'}));
-    particles.vertices.add(get_vertices(values, {fixed: 'x', floating: 'y', value: 'z'}));
+    var type;
+
+    for (var i = 0; i < plot_type_radio_buttons.length; ++i) {
+        if (plot_type_radio_buttons[i].checked) {
+            type = plot_type_radio_buttons[i].value;
+        }
+    }
+
+    console.log("plot_type:", type);
+
+    switch (type) {
+        default:
+        case "cubic": {
+            interpolant = new CubicInterpolant;
+        }
+        break;
+
+        case "bicubic": {
+            interpolant = new BicubicInterpolant;
+        }
+        break;
+    }
+
+    particles.vertices.add(interpolant.Build(values));
 
     console.log("'C_change' event handler work done");
 }
@@ -268,12 +246,25 @@ y_node_count_field.addEventListener("change", A_change);
 
 function_field.addEventListener("change", B_change);
 
+for (var i = 0; i < plot_type_radio_buttons.length; i++) {
+    plot_type_radio_buttons[i].addEventListener("change", C_change);
+}
+
 var scene    = new THREE.Scene();
 var camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 var renderer = new THREE.WebGLRenderer();
 
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById("render").appendChild(renderer.domElement);
+{
+    var renderer_container = document.getElementById("render");
+
+    var height = document.documentElement.clientHeight;
+    var width = document.documentElement.clientWidth;
+
+    console.log(width + " x " + height);
+
+    renderer.setSize(width, height);
+    renderer_container.appendChild(renderer.domElement);
+}
 
 camera.position.z = 15;
 
@@ -303,20 +294,44 @@ scene.add(particleSystem);
 var down = false;
 var sx = 0, sy = 0;
 
-renderer.domElement.onmousedown = renderer.domElement.ontouchstart = function (ev) {
+renderer.domElement.onmousedown = function (ev) {
     down = true;
+
     sx = ev.clientX;
     sy = ev.clientY;
-};
+}
 
-window.onmouseup = renderer.domElement.ontouchend = function () {
+window.onmouseup = function (ev) {
     down = false;
-};
+}
 
 window.onmousemove = function (ev) {
+    camera_move(ev.clientX, ev.clientY);
+}
+
+document.addEventListener('touchstart', function (ev) {
+    ev.preventDefault();
+
+    down = true;
+
+    sx = ev.touches[0].pageX;
+    sy = ev.touches[0].pageY;
+}, false);
+
+document.addEventListener('touchmove', function (ev) {
+    camera_move(ev.touches[0].pageX, ev.touches[0].pageY);
+}, false);
+
+document.addEventListener('touchend', function (ev) {
+    ev.preventDefault();
+
+    down = false;
+}, false);
+
+function camera_move (x, y) {
     if (down) {
-        var dx = ev.clientX - sx;
-        var dy = ev.clientY - sy;
+        var dx = x - sx;
+        var dy = y - sy;
 
         particleSystem.rotation.z += dx * 0.01;
         axes.rotation.z += dx * 0.01;
