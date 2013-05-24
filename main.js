@@ -162,65 +162,6 @@ var get_values = function (x_nodes, y_nodes, fun) {
     return values;
 }
 
-var get_vertices = function (nodes, markup) {
-    console.log("'get_vertices' called");
-
-    var floating = markup.floating || 'x';
-    var fixed    = markup.fixed    || 'y';
-    var value    = markup.value    || 'z';
-
-    var vertices = []
-
-    var nodes_along = nodes.flatten().sortBy(floating).groupBy(fixed);
-
-    // console.log(nodes_along);
-
-    for (var fixed_coordinate in nodes_along) {
-        // console.log(fixed_coordinate);
-        // console.log(nodes_along[fixed_coordinate]);
-
-        var current_nodes = nodes_along[fixed_coordinate];
-
-        var nodes_coordinates_only = current_nodes.clone();
-
-        for (var i = 0; i < nodes_coordinates_only.length; i++) {
-            var el = nodes_coordinates_only[i];
-
-            var new_element = Object.select(el, [floating, value]);
-
-            new_element.position = new_element[floating];
-            new_element.value    = new_element[value];
-
-            delete new_element[floating];
-            delete new_element[value];
-
-            nodes_coordinates_only[i] = new_element;
-        }
-
-        console.log(nodes_coordinates_only);
-
-        interpolant.Build(nodes_coordinates_only);
-
-        var floating_position = current_nodes[0][floating];
-        var fixed_position    = fixed_coordinate.toNumber();
-
-        while (floating_position <= current_nodes[current_nodes.length - 1][floating]) {
-            var pX = (fixed === 'x') ? fixed_position : floating_position,
-                pY = (fixed === 'y') ? fixed_position : floating_position,
-                pZ = interpolant.Interpolate(floating_position),
-                particle = new THREE.Vector3(pX, pY, pZ);
-
-            vertices.push(particle);
-
-            floating_position += 0.1;
-        }
-    }
-
-    console.log("'get_vertices' work done");
-
-    return vertices;
-}
-
 var A_change = function () {
     console.log("'A_change' event appeared");
 
@@ -265,8 +206,7 @@ var C_change = function () {
 
     console.log(particles);
 
-    particles.vertices.add(get_vertices(values, {fixed: 'y', floating: 'x', value: 'z'}));
-    particles.vertices.add(get_vertices(values, {fixed: 'x', floating: 'y', value: 'z'}));
+    particles.vertices.add(interpolant.Build(values));
 
     console.log("'C_change' event handler work done");
 }

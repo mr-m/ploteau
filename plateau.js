@@ -157,8 +157,7 @@ function CubicSpline (a, b, c, d, x) {
 function CubicInterpolant (nodes) {
     var self = this;
 
-    self.Build = function (nodes)
-    {
+    self.BuildSpline = function (nodes) {
         var splines = self.splines;
 
         var   nodes_count = nodes.length;
@@ -172,8 +171,8 @@ function CubicInterpolant (nodes) {
 
         for (var i = 0; i < nodes_count; ++i)
         {
-            splines[i].x = nodes[i].position;
-            splines[i].a = nodes[i].value;
+            splines[i].x = nodes[i].x;
+            splines[i].a = nodes[i].y;
         }
 
         splines[0].c = splines[nodes_count - 1].c = 0.0;
@@ -187,12 +186,12 @@ function CubicInterpolant (nodes) {
 
         for (var i = 1; i < nodes_count - 1; ++i)
         {
-            var hi  = nodes[i].position - nodes[i - 1].position;
-            var hi1 = nodes[i + 1].position - nodes[i].position;
+            var hi  = nodes[i].x - nodes[i - 1].x;
+            var hi1 = nodes[i + 1].x - nodes[i].x;
             var A = hi;
             var C = 2.0 * (hi + hi1);
             var B = hi1;
-            var F = 6.0 * ((nodes[i + 1].value - nodes[i].value) / hi1 - (nodes[i].value - nodes[i - 1].value) / hi);
+            var F = 6.0 * ((nodes[i + 1].y - nodes[i].y) / hi1 - (nodes[i].y - nodes[i - 1].y) / hi);
             var z = (A * alpha[i - 1] + C);
             alpha[i] = -B / z;
             beta[i] = (F - A * beta[i - 1]) / z;
@@ -207,10 +206,68 @@ function CubicInterpolant (nodes) {
         // По известным коэффициентам c[i] находим значения b[i] и d[i]
         for (var i = nodes_count - 1; i > 0; --i)
         {
-            var hi = nodes[i].position - nodes[i - 1].position;
+            var hi = nodes[i].x - nodes[i - 1].x;
             splines[i].d = (splines[i].c - splines[i - 1].c) / hi;
-            splines[i].b = hi * (2.0 * splines[i].c + splines[i - 1].c) / 6.0 + (nodes[i].value - nodes[i - 1].value) / hi;
+            splines[i].b = hi * (2.0 * splines[i].c + splines[i - 1].c) / 6.0 + (nodes[i].y - nodes[i - 1].y) / hi;
         }
+    }
+
+    self.BuildDimension = function (nodes, markup) {
+        var floating = markup.floating || 'x';
+        var fixed    = markup.fixed    || 'y';
+        var value    = markup.value    || 'z';
+
+        var vertices = [];
+
+        var nodes_along = nodes.flatten().sortBy(floating).groupBy(fixed);
+
+        for (var fixed_coordinate in nodes_along) {
+            var current_nodes = nodes_along[fixed_coordinate];
+
+            var nodes_coordinates_only = current_nodes.clone();
+
+            for (var i = 0; i < nodes_coordinates_only.length; i++) {
+                var el = nodes_coordinates_only[i];
+
+                var new_el = {x: el[floating], y: el[value]};
+
+                nodes_coordinates_only[i] = new_el;
+            }
+
+            console.log(nodes_coordinates_only);
+
+            self.BuildSpline(nodes_coordinates_only);
+
+            var floating_position = current_nodes[0][floating];
+            var fixed_position    = fixed_coordinate.toNumber();
+
+            while (floating_position <= current_nodes[current_nodes.length - 1][floating]) {
+                var pX = (fixed === 'x') ? fixed_position : floating_position,
+                    pY = (fixed === 'y') ? fixed_position : floating_position,
+                    pZ = self.Interpolate(floating_position),
+                    particle = new THREE.Vector3(pX, pY, pZ);
+
+                vertices.push(particle);
+
+                floating_position += 0.1;
+            }
+        }
+
+        console.log("'get_vertices' work done");
+
+        return vertices;
+    }
+
+    self.Build = function (nodes) {
+        var vertices = [];
+
+        var add1 = self.BuildDimension(nodes, {fixed: 'y', floating: 'x', value: 'z'});
+        var add2 = self.BuildDimension(nodes, {fixed: 'x', floating: 'y', value: 'z'});
+
+        vertices.add(add1);
+        vertices.add(add2);
+
+        return vertices;
     }
 
     self.splines = [];
