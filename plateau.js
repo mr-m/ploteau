@@ -281,8 +281,7 @@ function CubicInterpolant (nodes) {
     }
 
     // Вычисление значения интерполированной функции в произвольной точке
-    self.Interpolate = function (position)
-    {
+    self.Interpolate = function (position) {
         var splines = self.splines;
 
         if (splines == null)
@@ -393,8 +392,7 @@ function BicubicSurface (nodes) {
 function BicubicInterpolant (nodes) {
     var self = this;
 
-    self.Build = function (nodes)
-    {
+    self.Build = function (nodes) {
         var countY = nodes.length;
         var countX = nodes[0].length;
 
@@ -481,8 +479,7 @@ function BicubicInterpolant (nodes) {
     }
 
     // Вычисление значения интерполированной функции в произвольной точке
-    self.Interpolate = function (position)
-    {
+    self.Interpolate = function (position) {
         self.x_a = -10;
         self.x_b =  10;
 
