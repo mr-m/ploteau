@@ -253,3 +253,178 @@ function CubicInterpolant () {
         return s.a + (s.b + (s.c / 2.0 + s.d * dx / 6.0) * dx) * dx;
     }
 }
+
+function BicubicSurface (nodes) {
+    var self = this;
+
+    var a00;
+    var a01;
+    var a02;
+    var a03;
+
+    var a10;
+    var a11;
+    var a12;
+    var a13;
+
+    var a20;
+    var a21;
+    var a22;
+    var a23;
+
+    var a30;
+    var a31;
+    var a32;
+    var a33;
+
+    self.Build = function (p) {
+        a00 = p[1][1];
+        a01 = -.5*p[1][0] + .5*p[1][2];
+        a02 = p[1][0] - 2.5*p[1][1] + 2*p[1][2] - .5*p[1][3];
+        a03 = -.5*p[1][0] + 1.5*p[1][1] - 1.5*p[1][2] + .5*p[1][3];
+
+        a10 = -.5*p[0][1] + .5*p[2][1];
+        a11 = .25*p[0][0] - .25*p[0][2] - .25*p[2][0] + .25*p[2][2];
+        a12 = -.5*p[0][0] + 1.25*p[0][1] - p[0][2] + .25*p[0][3] + .5*p[2][0] - 1.25*p[2][1] + p[2][2] - .25*p[2][3];
+        a13 = .25*p[0][0] - .75*p[0][1] + .75*p[0][2] - .25*p[0][3] - .25*p[2][0] + .75*p[2][1] - .75*p[2][2] + .25*p[2][3];
+
+        a20 = p[0][1] - 2.5*p[1][1] + 2*p[2][1] - .5*p[3][1];
+        a21 = -.5*p[0][0] + .5*p[0][2] + 1.25*p[1][0] - 1.25*p[1][2] - p[2][0] + p[2][2] + .25*p[3][0] - .25*p[3][2];
+        a22 = p[0][0] - 2.5*p[0][1] + 2*p[0][2] - .5*p[0][3] - 2.5*p[1][0] + 6.25*p[1][1] - 5*p[1][2] + 1.25*p[1][3] + 2*p[2][0] - 5*p[2][1] + 4*p[2][2] - p[2][3] - .5*p[3][0] + 1.25*p[3][1] - p[3][2] + .25*p[3][3];
+        a23 = -.5*p[0][0] + 1.5*p[0][1] - 1.5*p[0][2] + .5*p[0][3] + 1.25*p[1][0] - 3.75*p[1][1] + 3.75*p[1][2] - 1.25*p[1][3] - p[2][0] + 3*p[2][1] - 3*p[2][2] + p[2][3] + .25*p[3][0] - .75*p[3][1] + .75*p[3][2] - .25*p[3][3];
+
+        a30 = -.5*p[0][1] + 1.5*p[1][1] - 1.5*p[2][1] + .5*p[3][1];
+        a31 = .25*p[0][0] - .25*p[0][2] - .75*p[1][0] + .75*p[1][2] + .75*p[2][0] - .75*p[2][2] - .25*p[3][0] + .25*p[3][2];
+        a32 = -.5*p[0][0] + 1.25*p[0][1] - p[0][2] + .25*p[0][3] + 1.5*p[1][0] - 3.75*p[1][1] + 3*p[1][2] - .75*p[1][3] - 1.5*p[2][0] + 3.75*p[2][1] - 3*p[2][2] + .75*p[2][3] + .5*p[3][0] - 1.25*p[3][1] + p[3][2] - .25*p[3][3];
+        a33 = .25*p[0][0] - .75*p[0][1] + .75*p[0][2] - .25*p[0][3] - .75*p[1][0] + 2.25*p[1][1] - 2.25*p[1][2] + .75*p[1][3] + .75*p[2][0] - 2.25*p[2][1] + 2.25*p[2][2] - .75*p[2][3] - .25*p[3][0] + .75*p[3][1] - .75*p[3][2] + .25*p[3][3];
+    }
+
+    if (typeof nodes !== 'undefined') {
+        self.nodes = nodes;
+        self.Build(self.nodes);
+    }
+
+    self.Interpolate = function (x, y) {
+        var x2 = x * x;
+        var x3 = x2 * x;
+        var y2 = y * y;
+        var y3 = y2 * y;
+
+        return (a00 + a01 * y + a02 * y2 + a03 * y3) +
+               (a10 + a11 * y + a12 * y2 + a13 * y3) * x +
+               (a20 + a21 * y + a22 * y2 + a23 * y3) * x2 +
+               (a30 + a31 * y + a32 * y2 + a33 * y3) * x3;
+    }
+}
+
+function BicubicInterpolant (nodes) {
+    var self = this;
+
+    self.Build = function (nodes)
+    {
+        var countY = nodes.length;
+        var countX = nodes[0].length;
+
+        var countY_extra = countY + 2;
+        var countX_extra = countX + 2;
+
+        var countY_surfaces = countY - 1;
+        var countX_surfaces = countX - 1;
+
+        console.log("surfaces (y * x): " + countY_surfaces + " * " + countX_surfaces);
+
+        var surfaces = new Array(countY_surfaces);
+
+        for (var i = 0; i < countY_surfaces; i++) {
+            surfaces[i] = new Array(countX_surfaces);
+        }
+
+        var input = Extrapolate(nodes);
+
+        for (var i = 0; i < countY_extra; i++) {
+            for (var j = 0; j < countX_extra; j++) {
+                input[i][j] = input[i][j].z;
+            }
+        }
+
+        for (var i = 1; i < countY; i++) {
+            for (var j = 1; j < countX; j++) {
+                var points = [[],[],[],[]];
+
+                points[0][0] = input[i - 1][j - 1];
+                points[1][0] = input[i    ][j - 1];
+                points[2][0] = input[i + 1][j - 1];
+                points[3][0] = input[i + 2][j - 1];
+
+                points[0][1] = input[i - 1][j];
+                points[1][1] = input[i    ][j];
+                points[2][1] = input[i + 1][j];
+                points[3][1] = input[i + 2][j];
+
+                points[0][2] = input[i - 1][j + 1];
+                points[1][2] = input[i    ][j + 1];
+                points[2][2] = input[i + 1][j + 1];
+                points[3][2] = input[i + 2][j + 1];
+
+                points[0][3] = input[i - 1][j + 2];
+                points[1][3] = input[i    ][j + 2];
+                points[2][3] = input[i + 1][j + 2];
+                points[3][3] = input[i + 2][j + 2];
+
+                surfaces[i - 1][j - 1] = new BicubicSurface(points);
+            }
+        }
+
+        var vertices = [];
+        var a = -10;
+        var b =  10;
+        var L = b - a;
+        var l = L / countX_surfaces;
+
+        var y = -10;
+        while (y <= 10) {
+            var x = -10;
+            while (x <= 10) {
+                var x_index = math.floor((L - (b - x)) / l);
+                var y_index = math.floor((L - (b - y)) / l);
+
+                var z = surfaces[y_index][x_index].Interpolate(x, y) / 1024 / 2;
+
+                var particle = new THREE.Vector3(x, y, z);
+
+                vertices.push(particle);
+
+                x += 0.1;
+            }
+            y += 0.1;
+        }
+
+        return vertices;
+    }
+
+    if (typeof nodes !== 'undefined') {
+        self.nodes = nodes;
+        self.Build(self.nodes);
+    }
+
+    // Вычисление значения интерполированной функции в произвольной точке
+    self.Interpolate = function (position)
+    {
+        self.x_a = -10;
+        self.x_b =  10;
+
+        self.y_a = -10;
+        self.y_b =  10;
+
+        self.x_L = x_b - x_a;
+        self.y_L = y_b - y_a;
+
+        self.x_l = x_L / countX_surfaces;
+        self.y_l = y_L / countY_surfaces;
+
+        var x_index = math.floor((L - (b - x)) / l);
+        var y_index = math.floor((L - (b - y)) / l);
+
+        var z = surfaces[y_index][x_index].Interpolate(x, y) / 1024 / 2;
+    }
+}
