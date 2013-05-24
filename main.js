@@ -294,20 +294,44 @@ scene.add(particleSystem);
 var down = false;
 var sx = 0, sy = 0;
 
-renderer.domElement.onmousedown = renderer.domElement.ontouchstart = function (ev) {
+renderer.domElement.onmousedown = function (ev) {
     down = true;
+
     sx = ev.clientX;
     sy = ev.clientY;
-};
+}
 
-window.onmouseup = renderer.domElement.ontouchend = function () {
+window.onmouseup = function (ev) {
     down = false;
-};
+}
 
 window.onmousemove = function (ev) {
+    camera_move(ev.clientX, ev.clientY);
+}
+
+document.addEventListener('touchstart', function (ev) {
+    ev.preventDefault();
+
+    down = true;
+
+    sx = ev.touches[0].pageX;
+    sy = ev.touches[0].pageY;
+}, false);
+
+document.addEventListener('touchmove', function (ev) {
+    camera_move(ev.touches[0].pageX, ev.touches[0].pageY);
+}, false);
+
+document.addEventListener('touchend', function (ev) {
+    ev.preventDefault();
+
+    down = false;
+}, false);
+
+function camera_move (x, y) {
     if (down) {
-        var dx = ev.clientX - sx;
-        var dy = ev.clientY - sy;
+        var dx = x - sx;
+        var dy = y - sy;
 
         particleSystem.rotation.z += dx * 0.01;
         axes.rotation.z += dx * 0.01;
