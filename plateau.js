@@ -163,25 +163,31 @@ function CubicInterpolant () {
     // Построение сплайна
     self.Build = function (nodes)
     {
-        var n = nodes.length;
+        var   nodes_count = nodes.length;
+        var splines_count = nodes_count - 1;
 
         // Инициализация массива сплайнов
-        for (var i = 0; i < n; ++i) {
+        for (var i = 0; i < nodes_count; ++i)
+        {
             splines[i] = new CubicSpline();
         }
-        for (var i = 0; i < n; ++i)
+
+        for (var i = 0; i < nodes_count; ++i)
         {
             splines[i].x = nodes[i].position;
             splines[i].a = nodes[i].value;
         }
-        splines[0].c = splines[n - 1].c = 0.0;
+
+        splines[0].c = splines[nodes_count - 1].c = 0.0;
 
         // Решение СЛАУ относительно коэффициентов сплайнов c[i] методом прогонки для трехдиагональных матриц
         // Вычисление прогоночных коэффициентов - прямой ход метода прогонки
-        var alpha = new Array(n - 1);
-        var beta  = new Array(n - 1);
+        var alpha = new Array(nodes_count);
+        var beta  = new Array(nodes_count);
+
         alpha[0] = beta[0] = 0.0;
-        for (var i = 1; i < n - 1; ++i)
+
+        for (var i = 1; i < nodes_count - 1; ++i)
         {
             var hi  = nodes[i].position - nodes[i - 1].position;
             var hi1 = nodes[i + 1].position - nodes[i].position;
@@ -195,13 +201,13 @@ function CubicInterpolant () {
         }
 
         // Нахождение решения - обратный ход метода прогонки
-        for (var i = n - 2; i > 0; --i)
+        for (var i = nodes_count - 2; i > 0; --i)
         {
             splines[i].c = alpha[i] * splines[i + 1].c + beta[i];
         }
 
         // По известным коэффициентам c[i] находим значения b[i] и d[i]
-        for (var i = n - 1; i > 0; --i)
+        for (var i = nodes_count - 1; i > 0; --i)
         {
             var hi = nodes[i].position - nodes[i - 1].position;
             splines[i].d = (splines[i].c - splines[i - 1].c) / hi;
@@ -220,7 +226,7 @@ function CubicInterpolant () {
         var n = splines.length;
         var s = new CubicSpline();
 
-        if (position <= splines[0].x) // Если x меньше точки сетки x[0] - пользуемся первым эл-тов массива
+        if (position <= splines[0].x) // Если x меньше точки сетки x[0] - пользуемся первым эл-том массива
         {
             s = splines[1];
         }

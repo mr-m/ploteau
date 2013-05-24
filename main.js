@@ -149,7 +149,9 @@ var get_values = function (x_nodes, y_nodes, fun) {
 
             var z = fun(x, y);
 
-            values[i][j] = new THREE.Vector3(x, y, z);
+            var vector_less = {x: x, y: y, z: z};
+
+            values[i][j] = vector_less;
         }
     }
 
