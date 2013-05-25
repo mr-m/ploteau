@@ -309,7 +309,7 @@ window.onmousemove = function (ev) {
     camera_move(ev.clientX, ev.clientY);
 }
 
-document.addEventListener('touchstart', function (ev) {
+renderer.domElement.addEventListener('touchstart', function (ev) {
     ev.preventDefault();
 
     down = true;
