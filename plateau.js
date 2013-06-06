@@ -505,14 +505,15 @@ function BicubicInterpolant (nodes) {
         var a = -10;
         var b =  10;
         var L = b - a;
-        var l = L / countX_surfaces;
+        var l_x = L / countX_surfaces;
+        var l_y = L / countY_surfaces;
 
         var y = -10;
         while (y <= 10) {
             var x = -10;
             while (x <= 10) {
-                var x_index = math.floor((L - (b - x)) / l);
-                var y_index = math.floor((L - (b - y)) / l);
+                var x_index = math.floor((L - (b - x)) / l_x);
+                var y_index = math.floor((L - (b - y)) / l_y);
 
                 var z = surfaces[y_index][x_index].Interpolate(x, y);
 
