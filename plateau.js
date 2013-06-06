@@ -56,7 +56,7 @@ function Extrapolate (nodes) {
     for (var i = 0; i < countY; i++) {
         for (var j = 0; j < countX; j++) {
             // Copying elements
-            input[i + 1][j + 1] = nodes[j][i];
+            input[i + 1][j + 1] = nodes[i][j];
 
             // Initializing not yet existing elements
 
