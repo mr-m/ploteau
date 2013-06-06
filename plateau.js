@@ -132,7 +132,7 @@ function Extrapolate (nodes) {
 
                 vector.x = v1.x + v1.x - v2.x;
                 vector.y = v1.y + v1.y - v2.y;
-                vector.z = v1.z - v2.z;
+                vector.z = v1.z + v1.z - v2.z;
 
                 input[i][j] = vector;
 
@@ -148,30 +148,46 @@ function Extrapolate (nodes) {
 
     {
         var v1 = input[0][1];
+        var v10 = input[0][2];
         var v2 = input[1][0];
+        var v20 = input[2][0];
 
-        input[0][0].z = (v1.z + v1.z) / 2;
+        var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
+
+        input[0][0].z = z;
     }
 
     {
         var v1 = input[0][countX_extra - 2];
+        var v10 = input[0][countX_extra - 3];
         var v2 = input[1][countX_extra - 1];
+        var v20 = input[2][countX_extra - 1];
 
-        input[0][countX_extra - 1].z = (v1.z + v1.z) / 2;
+        var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
+
+        input[0][countX_extra - 1].z = z;
     }
 
     {
         var v1 = input[countY_extra - 2][0];
+        var v10 = input[countY_extra - 3][0];
         var v2 = input[countY_extra - 1][1];
+        var v20 = input[countY_extra - 1][2];
 
-        input[countY_extra - 1][0].z = (v1.z + v1.z) / 2;
+        var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
+
+        input[countY_extra - 1][0].z = z;
     }
 
     {
         var v1 = input[countY_extra - 2][countX_extra - 1];
+        var v10 = input[countY_extra - 3][countX_extra - 1];
         var v2 = input[countY_extra - 1][countX_extra - 2];
+        var v20 = input[countY_extra - 1][countX_extra - 3];
 
-        input[countY_extra - 1][countX_extra - 1].z = (v1.z + v1.z) / 2;
+        var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
+
+        input[countY_extra - 1][countX_extra - 1].z = z;
     }
 
     console.log(input);
