@@ -38,6 +38,8 @@ function PrintMatrix (nodes, coordinate) {
 }
 
 function Extrapolate (nodes) {
+    console.group("extrapolation started");
+
     var watch_coordinate = "z";
 
     console.log("values of received nodes:");
@@ -164,9 +166,9 @@ function Extrapolate (nodes) {
     input[0][0].y = input[0][1].y + input[0][1].y - input[0][2].y;
 
     {
-        var v1 = input[0][1];
+        var v1  = input[0][1];
         var v10 = input[0][2];
-        var v2 = input[1][0];
+        var v2  = input[1][0];
         var v20 = input[2][0];
 
         var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
@@ -175,9 +177,9 @@ function Extrapolate (nodes) {
     }
 
     {
-        var v1 = input[0][countX_extra - 2];
+        var v1  = input[0][countX_extra - 2];
         var v10 = input[0][countX_extra - 3];
-        var v2 = input[1][countX_extra - 1];
+        var v2  = input[1][countX_extra - 1];
         var v20 = input[2][countX_extra - 1];
 
         var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
@@ -186,9 +188,9 @@ function Extrapolate (nodes) {
     }
 
     {
-        var v1 = input[countY_extra - 2][0];
+        var v1  = input[countY_extra - 2][0];
         var v10 = input[countY_extra - 3][0];
-        var v2 = input[countY_extra - 1][1];
+        var v2  = input[countY_extra - 1][1];
         var v20 = input[countY_extra - 1][2];
 
         var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
@@ -197,9 +199,9 @@ function Extrapolate (nodes) {
     }
 
     {
-        var v1 = input[countY_extra - 2][countX_extra - 1];
+        var v1  = input[countY_extra - 2][countX_extra - 1];
         var v10 = input[countY_extra - 3][countX_extra - 1];
-        var v2 = input[countY_extra - 1][countX_extra - 2];
+        var v2  = input[countY_extra - 1][countX_extra - 2];
         var v20 = input[countY_extra - 1][countX_extra - 3];
 
         var z = ((v1.z + v1.z - v10.z) + (v2.z + v2.z - v20.z)) / 2;
@@ -209,6 +211,8 @@ function Extrapolate (nodes) {
 
     console.log("values of output nodes:");
     PrintMatrix(input, watch_coordinate);
+
+    console.groupEnd();
 
     return input;
 }
@@ -466,6 +470,8 @@ function BicubicInterpolant (nodes) {
     var self = this;
 
     self.Build = function (nodes) {
+        console.group("Started building of bicubic interpolant");
+
         console.log("x values of received nodes:");
         PrintMatrix(nodes, "x")
 
@@ -558,6 +564,8 @@ function BicubicInterpolant (nodes) {
             }
             y += 0.1;
         }
+
+        console.groupEnd();
 
         return vertices;
     }
