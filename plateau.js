@@ -1,3 +1,42 @@
+function PrintMatrix (nodes, coordinate) {
+    if (typeof coordinate === 'undefined') {
+        coordinate = "x";
+    }
+
+    for (var i = 0; i < nodes.length; i++) {
+        var console_string = "";
+
+        for (var j = 0; j < nodes[i].length; j++) {
+            var object = nodes[i][j];
+
+            var value;
+            var string;
+
+            if (typeof object === "number") {
+                value  = object;
+                string = value.toString();
+            } else {
+                if (typeof object !== 'undefined') {
+                    value  = object[coordinate];
+                    string = value.toString();
+                } else {
+                    value  =  0;
+                    string = "-";
+                }
+            }
+
+            var length = string.length;
+
+            for (var k = 0; k < 5 - length; k++) {
+                console_string += " ";
+            }
+
+            console_string += string + " ";
+        }
+        console.log(console_string);
+    }
+}
+
 function Extrapolate (nodes) {
     var countY = nodes.length;
     var countX = nodes[0].length;
