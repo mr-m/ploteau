@@ -459,7 +459,7 @@ function BicubicInterpolant (nodes) {
                 var x_index = math.floor((L - (b - x)) / l);
                 var y_index = math.floor((L - (b - y)) / l);
 
-                var z = surfaces[y_index][x_index].Interpolate(x, y) / 1024 / 2;
+                var z = surfaces[y_index][x_index].Interpolate(x, y);
 
                 var particle = new THREE.Vector3(x, y, z);
 
