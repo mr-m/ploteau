@@ -459,18 +459,20 @@ function BicubicInterpolant (nodes) {
 
         console.log("surfaces (y * x): " + countY_surfaces + " * " + countX_surfaces);
 
-        var surfaces = new Array(countY_surfaces);
-
-        for (var i = 0; i < countY_surfaces; i++) {
-            surfaces[i] = new Array(countX_surfaces);
-        }
-
         var input = Extrapolate(nodes);
+
+
 
         for (var i = 0; i < countY_extra; i++) {
             for (var j = 0; j < countX_extra; j++) {
                 input[i][j] = input[i][j].z;
             }
+        }
+
+        var surfaces = new Array(countY_surfaces);
+
+        for (var i = 0; i < countY_surfaces; i++) {
+            surfaces[i] = new Array(countX_surfaces);
         }
 
         for (var i = 1; i < countY; i++) {
