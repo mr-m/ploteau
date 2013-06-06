@@ -38,6 +38,11 @@ function PrintMatrix (nodes, coordinate) {
 }
 
 function Extrapolate (nodes) {
+    var watch_coordinate = "z";
+
+    console.log("values of received nodes:");
+    PrintMatrix(nodes, watch_coordinate);
+
     var countY = nodes.length;
     var countX = nodes[0].length;
 
@@ -52,6 +57,9 @@ function Extrapolate (nodes) {
     for (var i = 0; i < countY_extra; i++) {
         input[i] = new Array(countX_extra);
     }
+
+    console.log("empty matrix of extrapolated nodes");
+    PrintMatrix(input, watch_coordinate);
 
     for (var i = 0; i < countY; i++) {
         for (var j = 0; j < countX; j++) {
@@ -78,11 +86,17 @@ function Extrapolate (nodes) {
         }
     }
 
+    console.log("partially zero-filled matrix of extrapolated nodes");
+    PrintMatrix(input, watch_coordinate);
+
     // Initializing elements at corners
     input[         0][         0] = {x: 0, y: 0, z: 0};
     input[         0][countX + 1] = {x: 0, y: 0, z: 0};
     input[countY + 1][         0] = {x: 0, y: 0, z: 0};
     input[countY + 1][countX + 1] = {x: 0, y: 0, z: 0};
+
+    console.log("fully zero-filled matrix of extrapolated nodes");
+    PrintMatrix(input, watch_coordinate);
 
     for (var i = 0; i < countY_extra; i++) {
         for (var j = 0; j < countX_extra; j++) {
@@ -141,6 +155,9 @@ function Extrapolate (nodes) {
         }
     }
 
+    console.log("coordinate filled matrix of extrapolated nodes");
+    PrintMatrix(input, watch_coordinate);
+
     // Upper-left corner should be handled separately
     // Because it can't get it's right values in the for-loop above
     input[0][0].x = input[0][1].x + input[0][1].x - input[0][2].x;
@@ -190,7 +207,8 @@ function Extrapolate (nodes) {
         input[countY_extra - 1][countX_extra - 1].z = z;
     }
 
-    console.log(input);
+    console.log("values of output nodes:");
+    PrintMatrix(input, watch_coordinate);
 
     return input;
 }
@@ -448,6 +466,9 @@ function BicubicInterpolant (nodes) {
     var self = this;
 
     self.Build = function (nodes) {
+        console.log("x values of received nodes:");
+        PrintMatrix(nodes, "x")
+
         var countY = nodes.length;
         var countX = nodes[0].length;
 
@@ -457,11 +478,18 @@ function BicubicInterpolant (nodes) {
         var countY_surfaces = countY - 1;
         var countX_surfaces = countX - 1;
 
-        console.log("surfaces (y * x): " + countY_surfaces + " * " + countX_surfaces);
+        console.log("number of surfaces (y * x): " + countY_surfaces + " * " + countX_surfaces);
 
         var input = Extrapolate(nodes);
 
+        console.log("x values of extrapolated nodes:");
+        PrintMatrix(input, "x");
 
+        console.log("y values of extrapolated nodes:");
+        PrintMatrix(input, "y");
+
+        console.log("z values of extrapolated nodes:");
+        PrintMatrix(input, "z");
 
         for (var i = 0; i < countY_extra; i++) {
             for (var j = 0; j < countX_extra; j++) {
@@ -498,6 +526,9 @@ function BicubicInterpolant (nodes) {
                 points[1][3] = input[i    ][j + 2];
                 points[2][3] = input[i + 1][j + 2];
                 points[3][3] = input[i + 2][j + 2];
+
+                console.log("points given to bicubic surface:");
+                PrintMatrix(points);
 
                 surfaces[i - 1][j - 1] = new BicubicSurface(points);
             }
