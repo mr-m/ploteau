@@ -11,16 +11,16 @@ function BicubicInterpolant (nodes) {
             console.groupEnd();
         }
 
-        var countY = nodes.length;
-        var countX = nodes[0].length;
+        var y_nodes_count = self.y_nodes_count = nodes.length;
+        var x_nodes_count = self.x_nodes_count = nodes[0].length;
 
-        var countY_extra = countY + 2;
-        var countX_extra = countX + 2;
+        var y_extra_count = self.y_extra_count = y_nodes_count + 2;
+        var x_extra_count = self.x_extra_count = x_nodes_count + 2;
 
-        var countY_surfaces = countY - 1;
-        var countX_surfaces = countX - 1;
+        var y_surfaces_count = self.y_surfaces_count = y_nodes_count - 1;
+        var x_surfaces_count = self.x_surfaces_count = x_nodes_count - 1;
 
-        console.log("Number of surfaces (y * x): " + countY_surfaces + " * " + countX_surfaces);
+        console.log("Number of surfaces (y * x): " + y_surfaces_count + " * " + x_surfaces_count);
 
         var input = Extrapolate(nodes);
 
@@ -30,14 +30,14 @@ function BicubicInterpolant (nodes) {
             console.groupEnd();
         }
 
-        self.surfaces = new Array(countY_surfaces);
+        var surfaces = self.surfaces = [];
 
-        for (var i = 0; i < countY_surfaces; i++) {
-            self.surfaces[i] = new Array(countX_surfaces);
+        for (var i = 0; i < y_surfaces_count; i++) {
+            surfaces[i] = [];
         }
 
-        for (var i = 1; i < countY; i++) {
-            for (var j = 1; j < countX; j++) {
+        for (var i = 1; i < self.y_nodes_count; i++) {
+            for (var j = 1; j < self.x_nodes_count; j++) {
                 var points = [[],[],[],[]];
 
                 points[0][0] = input[i - 1][j - 1];
@@ -66,18 +66,36 @@ function BicubicInterpolant (nodes) {
         }
 
         var vertices = [];
-        var a = -10;
-        var b =  10;
-        var L = b - a;
-        var l_x = L / countX_surfaces;
-        var l_y = L / countY_surfaces;
 
-        var y = -10;
+        var x_a = self.x_a = nodes.flatten().sortBy("x", false)[0].x;
+        var x_b = self.x_b = nodes.flatten().sortBy("x", true)[0].x;
+        var x_L = self.x_L = x_b - x_a;
+        var x_l = self.x_l = x_L / x_surfaces_count;
+
+        var y_a = self.y_a = nodes.flatten().sortBy("y", false)[0].y;
+        var y_b = self.y_b = nodes.flatten().sortBy("y", true)[0].y;
+        var y_L = self.x_L = y_b - y_a;
+        var y_l = self.x_l = y_L / y_surfaces_count;
+
+        var x_index = math.floor((x_L - (x_b - x_a)) / x_l);
+        var y_index = math.floor((y_L - (y_b - y_a)) / y_l);
+
+        var x = x_a;
+        var y = y_a;
+
         while (y <= 10) {
-            var x = -10;
+            x = x_a;
+
             while (x <= 10) {
-                var x_index = math.floor((L - (b - x)) / l_x);
-                var y_index = math.floor((L - (b - y)) / l_y);
+                y_index = math.floor((y_L - (y_b - y)) / y_l);
+                x_index = math.floor((x_L - (x_b - x)) / x_l);
+
+                if (y_index >= self.y_nodes_count - 1) {
+                    y_index = y_index - 1
+                }
+                if (x_index >= self.x_nodes_count - 1) {
+                    x_index = x_index - 1
+                }
 
                 var z = self.surfaces[y_index][x_index].Interpolate(x, y);
 
