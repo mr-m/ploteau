@@ -1,9 +1,50 @@
 function BicubicInterpolant (nodes) {
     var self = this;
 
+    self.Initialize = function (nodes) {
+        console.groupCollapsed("Initialization of BicubicInterpolant");
+
+        self.nodes = nodes;
+
+        var y_nodes_count = self.y_nodes_count = nodes.length;
+        var x_nodes_count = self.x_nodes_count = nodes[0].length;
+
+        var y_extra_count = self.y_extra_count = y_nodes_count + 2;
+        var x_extra_count = self.x_extra_count = x_nodes_count + 2;
+
+        var y_surfaces_count = self.y_surfaces_count = y_nodes_count - 1;
+        var x_surfaces_count = self.x_surfaces_count = x_nodes_count - 1;
+
+        console.log("Number of surfaces (y * x): " + y_surfaces_count + " * " + x_surfaces_count);
+
+        var x_a = self.x_a = nodes.flatten().sortBy("x", false)[0].x;
+        var x_b = self.x_b = nodes.flatten().sortBy("x", true)[0].x;
+        var x_L = self.x_L = x_b - x_a;
+        var x_l = self.x_l = x_L / x_surfaces_count;
+
+        var y_a = self.y_a = nodes.flatten().sortBy("y", false)[0].y;
+        var y_b = self.y_b = nodes.flatten().sortBy("y", true)[0].y;
+        var y_L = self.x_L = y_b - y_a;
+        var y_l = self.x_l = y_L / y_surfaces_count;
+
+        console.log("x_a:", x_a);
+        console.log("x_b:", x_b);
+        console.log("y_a:", y_a);
+        console.log("y_b:", y_b);
+
+        var surfaces = self.surfaces = [];
+
+        for (var i = 0; i < y_surfaces_count; i++) {
+            surfaces[i] = [];
+        }
+
+        console.groupEnd();
+    }
+
     self.Build = function (nodes) {
         console.group("Building of BicubicInterpolant");
 
+        self.Initialize(nodes);
 
         { // Вывод в консоль полученной матрицы вершин
             console.groupCollapsed("Nodes received by BicubicInterpolant constructor");
@@ -28,12 +69,6 @@ function BicubicInterpolant (nodes) {
             console.groupCollapsed("Extrapolated nodes");
             PrintCoordinates(input, ["x", "y", "z"]);
             console.groupEnd();
-        }
-
-        var surfaces = self.surfaces = [];
-
-        for (var i = 0; i < y_surfaces_count; i++) {
-            surfaces[i] = [];
         }
 
         for (var i = 1; i < self.y_nodes_count; i++) {
@@ -67,15 +102,15 @@ function BicubicInterpolant (nodes) {
 
         var vertices = [];
 
-        var x_a = self.x_a = nodes.flatten().sortBy("x", false)[0].x;
-        var x_b = self.x_b = nodes.flatten().sortBy("x", true)[0].x;
-        var x_L = self.x_L = x_b - x_a;
-        var x_l = self.x_l = x_L / x_surfaces_count;
+        var x_a = self.x_a;
+        var x_b = self.x_b;
+        var x_L = self.x_L;
+        var x_l = self.x_l;
 
-        var y_a = self.y_a = nodes.flatten().sortBy("y", false)[0].y;
-        var y_b = self.y_b = nodes.flatten().sortBy("y", true)[0].y;
-        var y_L = self.x_L = y_b - y_a;
-        var y_l = self.x_l = y_L / y_surfaces_count;
+        var y_a = self.y_a;
+        var y_b = self.y_b;
+        var y_L = self.x_L;
+        var y_l = self.x_l;
 
         var x_index = math.floor((x_L - (x_b - x_a)) / x_l);
         var y_index = math.floor((y_L - (y_b - y_a)) / y_l);
@@ -83,10 +118,10 @@ function BicubicInterpolant (nodes) {
         var x = x_a;
         var y = y_a;
 
-        while (y <= 10) {
+        while (y <= y_b) {
             x = x_a;
 
-            while (x <= 10) {
+            while (x <= x_b) {
                 y_index = math.floor((y_L - (y_b - y)) / y_l);
                 x_index = math.floor((x_L - (x_b - x)) / x_l);
 
@@ -97,7 +132,9 @@ function BicubicInterpolant (nodes) {
                     x_index = x_index - 1
                 }
 
-                var z = self.surfaces[y_index][x_index].Interpolate(x, y);
+                var surface = self.surfaces[y_index][x_index];
+
+                var z = surface.Interpolate(x, y);
 
                 var particle = new THREE.Vector3(x, y, z);
 
@@ -114,11 +151,7 @@ function BicubicInterpolant (nodes) {
     }
 
     if (typeof nodes !== 'undefined') {
-        self.nodes = nodes;
-
-        self.surfaces = [];
-
-        self.Build(self.nodes);
+        self.Build(nodes);
     }
 
     // Вычисление значения интерполированной функции в произвольной точке
