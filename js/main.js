@@ -41,7 +41,8 @@ var random_functions = [
     "im( (x*y)^(1/4) ) + re( (x*y)^(1/3) )",
     "(5*x*y) / (x^2 + y^2)",
     "(x^2 + y^2) * exp(1 - x^2 - y^2)",
-    "cos(x)/y"
+    "cos(x)/y",
+    "cos(pi*0.1*x)*y"
 ];
 
 var x_coordinates = [];
