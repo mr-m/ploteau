@@ -62,24 +62,25 @@ function CubicSpline (nodes) {
     var self = this;
 
     self.Build = function (nodes) {
-        var splines = self.splines;
+        var segments = self.segments = [];
 
-        var   nodes_count = nodes.length;
-        var splines_count = nodes_count - 1;
+        var nodes_count = nodes.length;
+
+        var segments_count = nodes_count - 1;
 
         // Инициализация массива сплайнов
         for (var i = 0; i < nodes_count; ++i)
         {
-            splines[i] = new CubicSegment();
+            segments[i] = new CubicSegment();
         }
 
         for (var i = 0; i < nodes_count; ++i)
         {
-            splines[i].x = nodes[i].x;
-            splines[i].a = nodes[i].y;
+            segments[i].x = nodes[i].x;
+            segments[i].a = nodes[i].y;
         }
 
-        splines[0].c = splines[nodes_count - 1].c = 0.0;
+        segments[0].c = segments[nodes_count - 1].c = 0.0;
 
         // Решение СЛАУ относительно коэффициентов сплайнов c[i] методом прогонки для трехдиагональных матриц
         // Вычисление прогоночных коэффициентов - прямой ход метода прогонки
@@ -104,19 +105,19 @@ function CubicSpline (nodes) {
         // Нахождение решения - обратный ход метода прогонки
         for (var i = nodes_count - 2; i > 0; --i)
         {
-            splines[i].c = alpha[i] * splines[i + 1].c + beta[i];
+            segments[i].c = alpha[i] * segments[i + 1].c + beta[i];
         }
 
         // По известным коэффициентам c[i] находим значения b[i] и d[i]
         for (var i = nodes_count - 1; i > 0; --i)
         {
             var hi = nodes[i].x - nodes[i - 1].x;
-            splines[i].d = (splines[i].c - splines[i - 1].c) / hi;
-            splines[i].b = hi * (2.0 * splines[i].c + splines[i - 1].c) / 6.0 + (nodes[i].y - nodes[i - 1].y) / hi;
+            segments[i].d = (segments[i].c - segments[i - 1].c) / hi;
+            segments[i].b = hi * (2.0 * segments[i].c + segments[i - 1].c) / 6.0 + (nodes[i].y - nodes[i - 1].y) / hi;
         }
     }
 
-    self.splines = [];
+    self.segments = [];
 
     if (typeof nodes !== 'undefined')
     {
@@ -127,23 +128,23 @@ function CubicSpline (nodes) {
 
     // Вычисление значения интерполированной функции в произвольной точке
     self.Interpolate = function (position) {
-        var splines = self.splines;
+        var segments = self.segments;
 
-        if (splines == null)
+        if (segments == null)
         {
             return double.NaN; // Если сплайны ещё не построены - возвращаем NaN
         }
 
-        var n = splines.length;
+        var n = segments.length;
         var s = new CubicSegment();
 
-        if (position <= splines[0].x) // Если x меньше точки сетки x[0] - пользуемся первым эл-том массива
+        if (position <= segments[0].x) // Если x меньше точки сетки x[0] - пользуемся первым эл-том массива
         {
-            s = splines[1];
+            s = segments[1];
         }
-        else if (position >= splines[n - 1].x) // Если x больше точки сетки x[n - 1] - пользуемся последним эл-том массива
+        else if (position >= segments[n - 1].x) // Если x больше точки сетки x[n - 1] - пользуемся последним эл-том массива
         {
-            s = splines[n - 1];
+            s = segments[n - 1];
         }
         else // Иначе x лежит между граничными точками сетки - производим бинарный поиск нужного эл-та массива
         {
@@ -153,7 +154,7 @@ function CubicSpline (nodes) {
             {
                 // Force to unsigned int32
                 var k = (i + (j - i) / 2) >>> 0;
-                if (position <= splines[k].x)
+                if (position <= segments[k].x)
                 {
                     j = k;
                 }
@@ -162,7 +163,7 @@ function CubicSpline (nodes) {
                     i = k;
                 }
             }
-            s = splines[j];
+            s = segments[j];
         }
 
         var dx = position - s.x;
