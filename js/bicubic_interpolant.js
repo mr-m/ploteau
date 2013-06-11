@@ -85,6 +85,7 @@ function BicubicInterpolant (nodes) {
                 points[3][3] = input[i + 2][j + 2];
 
                 console.log("Building of ["+i+","+j+"] BicubicSurface");
+
                 self.surfaces[i - 1][j - 1] = new BicubicSurface(points);
             }
         }
@@ -104,8 +105,14 @@ function BicubicInterpolant (nodes) {
         var x_index = math.floor((x_L - (x_b - x_a)) / x_l);
         var y_index = math.floor((y_L - (y_b - y_a)) / y_l);
 
+        var x_index_last = x_index;
+        var y_index_last = y_index;
+
         var x = x_a;
         var y = y_a;
+
+        var x_last = x;
+        var y_last = y;
 
         while (y <= y_b) {
             x = x_a;
@@ -121,6 +128,19 @@ function BicubicInterpolant (nodes) {
                     x_index = x_index - 1
                 }
 
+                if (y_index != y_index_last) {
+                    console.groupCollapsed("Index connected to Y value changed");
+                    console.log("Coordinate:", y_last, "→", y);
+                    console.log("Index:", y_index_last, "→", y_index);
+                    console.groupEnd();
+                }
+                if (x_index != x_index_last) {
+                    console.groupCollapsed("Index connected to X value changed");
+                    console.log("Coordinate:", x_last, "→", x);
+                    console.log("Index:", x_index_last, "→", x_index);
+                    console.groupEnd();
+                }
+
                 var surface = self.surfaces[y_index][x_index];
 
                 var z = surface.Interpolate(x, y);
@@ -128,6 +148,12 @@ function BicubicInterpolant (nodes) {
                 var particle = new THREE.Vector3(x, y, z);
 
                 vertices.push(particle);
+
+                x_index_last = x_index;
+                y_index_last = y_index;
+
+                x_last = x;
+                y_last = y;
 
                 x += 0.1;
             }
