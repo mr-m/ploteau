@@ -46,16 +46,12 @@ function BicubicSurface (nodes) {
             var nodes_count = p.length;
             var segments_count = nodes_count - 1;
 
-            console.groupCollapsed("Nodes received by CubicSpline builder");
-            console.log("x values of received nodes");
-            PrintMatrix(p, "x");
 
-            console.log("y values of received nodes");
-            PrintMatrix(p, "y");
-
-            console.log("z values of received nodes");
-            PrintMatrix(p, "z");
-            console.groupEnd();
+            { // Вывод в консоль полученной матрицы вершин
+                console.groupCollapsed("Nodes received by CubicSpline builder");
+                PrintCoordinates(p, ["x", "y", "z"]);
+                console.groupEnd();
+            }
 
             for (var i = 0; i < nodes_count; i++) {
                 for (var j = 0; j < p[i].length; j++) {

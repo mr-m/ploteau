@@ -4,16 +4,10 @@ function BicubicInterpolant (nodes) {
     self.Build = function (nodes) {
         console.group("Building of BicubicInterpolant");
 
+
         { // Вывод в консоль полученной матрицы вершин
-            console.groupCollapsed("Received nodes");
-            console.log("x values of received nodes:");
-            PrintMatrix(nodes, "x");
-
-            console.log("y values of received nodes:");
-            PrintMatrix(nodes, "y");
-
-            console.log("z values of received nodes:");
-            PrintMatrix(nodes, "z");
+            console.groupCollapsed("Nodes received by BicubicInterpolant constructor");
+            PrintCoordinates(nodes, ["x", "y", "z"]);
             console.groupEnd();
         }
 
@@ -32,14 +26,7 @@ function BicubicInterpolant (nodes) {
 
         { // Вывод в консоль экстраполированной матрицы вершин
             console.groupCollapsed("Extrapolated nodes");
-            console.log("x values of extrapolated nodes:");
-            PrintMatrix(input, "x");
-
-            console.log("y values of extrapolated nodes:");
-            PrintMatrix(input, "y");
-
-            console.log("z values of extrapolated nodes:");
-            PrintMatrix(input, "z");
+            PrintCoordinates(input, ["x", "y", "z"]);
             console.groupEnd();
         }
 

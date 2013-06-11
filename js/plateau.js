@@ -44,6 +44,14 @@ function PrintMatrix (nodes, coordinate) {
     }
 }
 
+function PrintCoordinates (nodes, coordinates) {
+    for (var i = 0; i < coordinates.length; i++) {
+        console.log(coordinates[i], "values:");
+
+        PrintMatrix(nodes, coordinates[i]);
+    }
+}
+
 function CubicSegment (a, b, c, d, x) {
     if (typeof a === 'undefined') a = 0;
     if (typeof b === 'undefined') b = 0;
