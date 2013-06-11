@@ -52,17 +52,6 @@ function BicubicInterpolant (nodes) {
             console.groupEnd();
         }
 
-        var y_nodes_count = self.y_nodes_count = nodes.length;
-        var x_nodes_count = self.x_nodes_count = nodes[0].length;
-
-        var y_extra_count = self.y_extra_count = y_nodes_count + 2;
-        var x_extra_count = self.x_extra_count = x_nodes_count + 2;
-
-        var y_surfaces_count = self.y_surfaces_count = y_nodes_count - 1;
-        var x_surfaces_count = self.x_surfaces_count = x_nodes_count - 1;
-
-        console.log("Number of surfaces (y * x): " + y_surfaces_count + " * " + x_surfaces_count);
-
         var input = Extrapolate(nodes);
 
         { // Вывод в консоль экстраполированной матрицы вершин
@@ -152,25 +141,5 @@ function BicubicInterpolant (nodes) {
 
     if (typeof nodes !== 'undefined') {
         self.Build(nodes);
-    }
-
-    // Вычисление значения интерполированной функции в произвольной точке
-    self.Interpolate = function (position) {
-        self.x_a = -10;
-        self.x_b =  10;
-
-        self.y_a = -10;
-        self.y_b =  10;
-
-        self.x_L = x_b - x_a;
-        self.y_L = y_b - y_a;
-
-        self.x_l = x_L / countX_surfaces;
-        self.y_l = y_L / countY_surfaces;
-
-        var x_index = math.floor((L - (b - x)) / l);
-        var y_index = math.floor((L - (b - y)) / l);
-
-        var z = surfaces[y_index][x_index].Interpolate(x, y) / 1024 / 2;
     }
 }
