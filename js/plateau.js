@@ -196,7 +196,7 @@ function BicubicSurface (nodes) {
     var a33;
 
     self.Build = function (p) {
-        if (true) {
+        if (false) {
             a00 = p[1][1];
             a01 = -.5*p[1][0] + .5*p[1][2];
             a02 = p[1][0] - 2.5*p[1][1] + 2*p[1][2] - .5*p[1][3];
@@ -216,16 +216,41 @@ function BicubicSurface (nodes) {
             a31 = .25*p[0][0] - .25*p[0][2] - .75*p[1][0] + .75*p[1][2] + .75*p[2][0] - .75*p[2][2] - .25*p[3][0] + .25*p[3][2];
             a32 = -.5*p[0][0] + 1.25*p[0][1] - p[0][2] + .25*p[0][3] + 1.5*p[1][0] - 3.75*p[1][1] + 3*p[1][2] - .75*p[1][3] - 1.5*p[2][0] + 3.75*p[2][1] - 3*p[2][2] + .75*p[2][3] + .5*p[3][0] - 1.25*p[3][1] + p[3][2] - .25*p[3][3];
             a33 = .25*p[0][0] - .75*p[0][1] + .75*p[0][2] - .25*p[0][3] - .75*p[1][0] + 2.25*p[1][1] - 2.25*p[1][2] + .75*p[1][3] + .75*p[2][0] - 2.25*p[2][1] + 2.25*p[2][2] - .75*p[2][3] - .25*p[3][0] + .75*p[3][1] - .75*p[3][2] + .25*p[3][3];
+        } else {
+            var nodes_count = p.length;
+            var segments_count = nodes_count - 1;
+
+            console.groupCollapsed("Nodes received by CubicSpline builder");
+            console.log("x values of received nodes");
+            PrintMatrix(p, "x");
+
+            console.log("y values of received nodes");
+            PrintMatrix(p, "y");
+
+            console.log("z values of received nodes");
+            PrintMatrix(p, "z");
+            console.groupEnd();
+
+            for (var i = 0; i < nodes_count; i++) {
+                for (var j = 0; j < p[i].length; j++) {
+                    p[i][j] = {x: p[i][j].x, y: p[i][j].z};
+                }
+
+                self.splines[i] = new CubicSpline(p[i]);
+            }
         }
     }
 
     if (typeof nodes !== 'undefined') {
         self.nodes = nodes;
+
+        self.splines = [];
+
         self.Build(self.nodes);
     }
 
     self.Interpolate = function (x, y) {
-        if (true) {
+        if (false) {
             var x2 = x * x;
             var x3 = x2 * x;
             var y2 = y * y;
@@ -235,6 +260,26 @@ function BicubicSurface (nodes) {
                    (a10 + a11 * y + a12 * y2 + a13 * y3) * x +
                    (a20 + a21 * y + a22 * y2 + a23 * y3) * x2 +
                    (a30 + a31 * y + a32 * y2 + a33 * y3) * x3;
+        } else {
+            var ar = [];
+
+            for (var i = 0; i < self.splines.length; i++) {
+                var interpolation_result = self.splines[i].Interpolate(x);
+
+                if (interpolation_result == NaN) {
+                    break;
+                }
+
+                var x_value = self.nodes[i][0].y;
+                var y_value = interpolation_result;
+
+                ar[i] = {x: x_value, y: y_value};
+            }
+
+            var spline = new CubicSpline(ar);
+            var result = spline.Interpolate(y);
+
+            return result;
         }
     }
 }
