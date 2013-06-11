@@ -3,31 +3,38 @@ function PrintMatrix (nodes, coordinate) {
         coordinate = "x";
     }
 
-    for (var i = 0; i < nodes.length; i++) {
-        var console_string = "";
+    if ((typeof nodes[0] == "object") && (nodes[0] instanceof Array)) {
+        for (var i in nodes) {
+            PrintMatrix(nodes[i], coordinate);
+        }
+    } else {
+        var console_string = "|";
 
-        for (var j = 0; j < nodes[i].length; j++) {
-            var object = nodes[i][j];
+        for (var j = 0; j < nodes.length; j++) {
+            var object = nodes[j];
 
             var value;
             var string;
 
             if (typeof object === "number") {
-                value  = object;
-                string = value.toString();
+                value = object;
             } else {
                 if (typeof object !== 'undefined') {
-                    value  = object[coordinate];
-                    string = value.toString();
+                    value = object[coordinate];
                 } else {
-                    value  =  0;
-                    string = "-";
+                    value = NaN;
                 }
+            }
+
+            if (value !== NaN) {
+                string = value.round(2).toString();
+            } else {
+                string = "-";
             }
 
             var length = string.length;
 
-            for (var k = 0; k < 5 - length; k++) {
+            for (var k = 0; k < 8 - length; k++) {
                 console_string += " ";
             }
 
