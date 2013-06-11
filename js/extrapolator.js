@@ -1,9 +1,9 @@
 function Extrapolate (nodes) {
-    console.group("extrapolation started");
+    console.groupCollapsed("Extrapolation process started");
 
     var watch_coordinate = "z";
 
-    console.log("values of received nodes:");
+    console.log("Values of received nodes:");
     PrintMatrix(nodes, watch_coordinate);
 
     var countY = nodes.length;
@@ -12,8 +12,8 @@ function Extrapolate (nodes) {
     var countY_extra = countY + 2;
     var countX_extra = countX + 2;
 
-    console.log("initial nodes (y * x): " + countY + " * " + countX);
-    console.log("extrapolated nodes (y * x): " + countY_extra + " * " + countX_extra);
+    console.log("Initial nodes (y * x): " + countY + " * " + countX);
+    console.log("Extrapolated nodes (y * x): " + countY_extra + " * " + countX_extra);
 
     var input = new Array(countY_extra);
 
@@ -21,7 +21,7 @@ function Extrapolate (nodes) {
         input[i] = new Array(countX_extra);
     }
 
-    console.log("empty matrix of extrapolated nodes");
+    console.log("Empty matrix of extrapolated nodes");
     PrintMatrix(input, watch_coordinate);
 
     for (var i = 0; i < countY; i++) {
@@ -49,7 +49,7 @@ function Extrapolate (nodes) {
         }
     }
 
-    console.log("partially zero-filled matrix of extrapolated nodes");
+    console.log("Partially zero-filled matrix of extrapolated nodes");
     PrintMatrix(input, watch_coordinate);
 
     // Initializing elements at corners
@@ -58,7 +58,7 @@ function Extrapolate (nodes) {
     input[countY + 1][         0] = {x: 0, y: 0, z: 0};
     input[countY + 1][countX + 1] = {x: 0, y: 0, z: 0};
 
-    console.log("fully zero-filled matrix of extrapolated nodes");
+    console.log("Fully zero-filled matrix of extrapolated nodes");
     PrintMatrix(input, watch_coordinate);
 
     for (var i = 0; i < countY_extra; i++) {
@@ -118,7 +118,7 @@ function Extrapolate (nodes) {
         }
     }
 
-    console.log("coordinate filled matrix of extrapolated nodes");
+    console.log("Coordinate filled matrix of extrapolated nodes");
     PrintMatrix(input, watch_coordinate);
 
     // Upper-left corner should be handled separately
@@ -170,7 +170,7 @@ function Extrapolate (nodes) {
         input[countY_extra - 1][countX_extra - 1].z = z;
     }
 
-    console.log("values of output nodes:");
+    console.log("Values of output nodes:");
     PrintMatrix(input, watch_coordinate);
 
     console.groupEnd();
