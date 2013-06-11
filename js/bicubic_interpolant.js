@@ -2,10 +2,20 @@ function BicubicInterpolant (nodes) {
     var self = this;
 
     self.Build = function (nodes) {
-        console.group("Started building of bicubic interpolant");
+        console.group("Building of BicubicInterpolant");
 
-        console.log("x values of received nodes:");
-        PrintMatrix(nodes, "x")
+        { // Вывод в консоль полученной матрицы вершин
+            console.groupCollapsed("Received nodes");
+            console.log("x values of received nodes:");
+            PrintMatrix(nodes, "x");
+
+            console.log("y values of received nodes:");
+            PrintMatrix(nodes, "y");
+
+            console.log("z values of received nodes:");
+            PrintMatrix(nodes, "z");
+            console.groupEnd();
+        }
 
         var countY = nodes.length;
         var countX = nodes[0].length;
@@ -16,23 +26,21 @@ function BicubicInterpolant (nodes) {
         var countY_surfaces = countY - 1;
         var countX_surfaces = countX - 1;
 
-        console.log("number of surfaces (y * x): " + countY_surfaces + " * " + countX_surfaces);
+        console.log("Number of surfaces (y * x): " + countY_surfaces + " * " + countX_surfaces);
 
         var input = Extrapolate(nodes);
 
-        console.log("x values of extrapolated nodes:");
-        PrintMatrix(input, "x");
+        { // Вывод в консоль экстраполированной матрицы вершин
+            console.groupCollapsed("Extrapolated nodes");
+            console.log("x values of extrapolated nodes:");
+            PrintMatrix(input, "x");
 
-        console.log("y values of extrapolated nodes:");
-        PrintMatrix(input, "y");
+            console.log("y values of extrapolated nodes:");
+            PrintMatrix(input, "y");
 
-        console.log("z values of extrapolated nodes:");
-        PrintMatrix(input, "z");
-
-        for (var i = 0; i < countY_extra; i++) {
-            for (var j = 0; j < countX_extra; j++) {
-                input[i][j] = input[i][j].z;
-            }
+            console.log("z values of extrapolated nodes:");
+            PrintMatrix(input, "z");
+            console.groupEnd();
         }
 
         self.surfaces = new Array(countY_surfaces);
@@ -65,9 +73,7 @@ function BicubicInterpolant (nodes) {
                 points[2][3] = input[i + 1][j + 2];
                 points[3][3] = input[i + 2][j + 2];
 
-                console.log("points given to bicubic surface:");
-                PrintMatrix(points);
-
+                console.log("Building of ["+i+","+j+"] BicubicSurface");
                 self.surfaces[i - 1][j - 1] = new BicubicSurface(points);
             }
         }
