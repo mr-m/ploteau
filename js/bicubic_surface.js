@@ -43,9 +43,11 @@ function BicubicSurface (nodes) {
             a32 = -.5*p[0][0] + 1.25*p[0][1] - p[0][2] + .25*p[0][3] + 1.5*p[1][0] - 3.75*p[1][1] + 3*p[1][2] - .75*p[1][3] - 1.5*p[2][0] + 3.75*p[2][1] - 3*p[2][2] + .75*p[2][3] + .5*p[3][0] - 1.25*p[3][1] + p[3][2] - .25*p[3][3];
             a33 = .25*p[0][0] - .75*p[0][1] + .75*p[0][2] - .25*p[0][3] - .75*p[1][0] + 2.25*p[1][1] - 2.25*p[1][2] + .75*p[1][3] + .75*p[2][0] - 2.25*p[2][1] + 2.25*p[2][2] - .75*p[2][3] - .25*p[3][0] + .75*p[3][1] - .75*p[3][2] + .25*p[3][3];
         } else {
-            var nodes_count = p.length;
-            var segments_count = nodes_count - 1;
+            var y_nodes_count = p.length;
+            var x_nodes_count = p[0].length;
 
+            var y_segments_count = y_nodes_count - 1;
+            var x_segments_count = x_nodes_count - 1;
 
             { // Вывод в консоль полученной матрицы вершин
                 console.groupCollapsed("Nodes received by CubicSpline builder");
@@ -53,8 +55,8 @@ function BicubicSurface (nodes) {
                 console.groupEnd();
             }
 
-            for (var i = 0; i < nodes_count; i++) {
-                for (var j = 0; j < p[i].length; j++) {
+            for (var i = 0; i < y_nodes_count; i++) {
+                for (var j = 0; j < x_nodes_count; j++) {
                     p[i][j] = {x: p[i][j].x, y: p[i][j].z};
                 }
 
