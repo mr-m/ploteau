@@ -35,10 +35,10 @@ function BicubicInterpolant (nodes) {
             }
         }
 
-        var surfaces = new Array(countY_surfaces);
+        self.surfaces = new Array(countY_surfaces);
 
         for (var i = 0; i < countY_surfaces; i++) {
-            surfaces[i] = new Array(countX_surfaces);
+            self.surfaces[i] = new Array(countX_surfaces);
         }
 
         for (var i = 1; i < countY; i++) {
@@ -68,7 +68,7 @@ function BicubicInterpolant (nodes) {
                 console.log("points given to bicubic surface:");
                 PrintMatrix(points);
 
-                surfaces[i - 1][j - 1] = new BicubicSurface(points);
+                self.surfaces[i - 1][j - 1] = new BicubicSurface(points);
             }
         }
 
@@ -86,7 +86,7 @@ function BicubicInterpolant (nodes) {
                 var x_index = math.floor((L - (b - x)) / l_x);
                 var y_index = math.floor((L - (b - y)) / l_y);
 
-                var z = surfaces[y_index][x_index].Interpolate(x, y);
+                var z = self.surfaces[y_index][x_index].Interpolate(x, y);
 
                 var particle = new THREE.Vector3(x, y, z);
 
@@ -104,6 +104,9 @@ function BicubicInterpolant (nodes) {
 
     if (typeof nodes !== 'undefined') {
         self.nodes = nodes;
+
+        self.surfaces = [];
+
         self.Build(self.nodes);
     }
 
