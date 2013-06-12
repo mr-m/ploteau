@@ -50,7 +50,7 @@ function BicubicSurface (nodes) {
             var x_segments_count = x_nodes_count - 1;
 
             { // Вывод в консоль полученной матрицы вершин
-                console.groupCollapsed("Nodes received by CubicSpline builder");
+            console.groupCollapsed("Nodes received by BicubicSurface builder");
                 PrintCoordinates(p, ["x", "y", "z"]);
                 console.groupEnd();
             }
@@ -103,7 +103,13 @@ function BicubicSurface (nodes) {
             var spline = new CubicSpline(ar);
             var result = spline.Interpolate(y);
 
-            return result;
+        if (false) {
+            console.groupCollapsed("Interpolation at ["+y+","+x+"] node");
+            PrintMatrix(ar);
+            console.log("result:", result);
+            console.groupEnd();
         }
+
+        return result;
     }
 }

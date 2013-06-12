@@ -23,8 +23,6 @@ function CubicInterpolant (nodes) {
                 nodes_coordinates_only[i] = new_el;
             }
 
-            console.log(nodes_coordinates_only);
-
             self.splines[fixed][fixed_coordinate] = new CubicSpline(nodes_coordinates_only);
 
             var current_spline = self.splines[fixed][fixed_coordinate];

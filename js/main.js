@@ -167,7 +167,7 @@ var get_values = function (x_nodes, y_nodes, fun) {
 }
 
 var A_change = function () {
-    console.group("'A_change' event appeared");
+    console.groupCollapsed("'A_change' event appeared");
 
     get_boundaries();
     get_nodes_count();
@@ -177,7 +177,7 @@ var A_change = function () {
 }
 
 var B_change = function () {
-    console.group("'B_change' event");
+    console.groupCollapsed("'B_change' event");
 
     var function_string = get_value(function_field);
     f = get_function(function_string);

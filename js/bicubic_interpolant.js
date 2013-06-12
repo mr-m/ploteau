@@ -29,8 +29,11 @@ function BicubicInterpolant (nodes) {
 
         console.log("x_a:", x_a);
         console.log("x_b:", x_b);
+        console.log("x_surfaces_count:", x_surfaces_count);
+
         console.log("y_a:", y_a);
         console.log("y_b:", y_b);
+        console.log("y_surfaces_count:", y_surfaces_count);
 
         var surfaces = self.surfaces = [];
 
@@ -122,23 +125,25 @@ function BicubicInterpolant (nodes) {
                 x_index = math.floor((x_L - (x_b - x)) / x_l);
 
                 if (y_index >= self.y_nodes_count - 1) {
-                    y_index = y_index - 1
+                    y_index = y_index - 1;
                 }
                 if (x_index >= self.x_nodes_count - 1) {
-                    x_index = x_index - 1
+                    x_index = x_index - 1;
                 }
 
-                if (y_index != y_index_last) {
-                    console.groupCollapsed("Index connected to Y value changed");
-                    console.log("Coordinate:", y_last, "→", y);
-                    console.log("Index:", y_index_last, "→", y_index);
-                    console.groupEnd();
-                }
-                if (x_index != x_index_last) {
-                    console.groupCollapsed("Index connected to X value changed");
-                    console.log("Coordinate:", x_last, "→", x);
-                    console.log("Index:", x_index_last, "→", x_index);
-                    console.groupEnd();
+                if (false) {
+                    if (y_index != y_index_last) {
+                        console.groupCollapsed("Index connected to Y value changed");
+                        console.log("Coordinate:", y_last, "→", y);
+                        console.log("Index:", y_index_last, "→", y_index);
+                        console.groupEnd();
+                    }
+                    if (x_index != x_index_last) {
+                        console.groupCollapsed("Index connected to X value changed");
+                        console.log("Coordinate:", x_last, "→", x);
+                        console.log("Index:", x_index_last, "→", x_index);
+                        console.groupEnd();
+                    }
                 }
 
                 var surface = self.surfaces[y_index][x_index];
@@ -155,9 +160,9 @@ function BicubicInterpolant (nodes) {
                 x_last = x;
                 y_last = y;
 
-                x += 0.1;
+                x += 0.2;
             }
-            y += 0.1;
+            y += 0.2;
         }
 
         console.groupEnd();
