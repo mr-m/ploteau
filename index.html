@@ -13,15 +13,16 @@
                         <h3>Функция</h3>
                         <label for="function">Функция</label>
                         <input type="text" name="function" id="function" value="cos(x) * cos(y)">
+                        <input type="button" name="random" id="random" value="&#8635;">
                     </div>
                     <div>
                         <h3>Тип графика</h3>
                         <div>
-                            <input type="radio" name="plot" value="cubic" id="cubic" checked="checked">
+                            <input type="radio" name="plot" value="cubic" id="cubic">
                             <label for="cubic">Кубическая интерполяция</label>
                         </div>
                         <div>
-                            <input type="radio" name="plot" value="bicubic" id="bicubic">
+                            <input type="radio" name="plot" value="bicubic" id="bicubic" checked="checked">
                             <label for="bicubic">Бикубическая интерполяция</label>
                         </div>
                         <div>
@@ -48,22 +49,26 @@
                             <h4>По оси X</h4>
                             <div>
                                 <label for="x_lower_boundary">Нижняя граница по оси X</label>
-                                <input type="text" name="x_lower_boundary" id="x_lower_boundary" title="Нижняя граница по оси X" value="-10">
+                                <input type="text" name="x_lower_boundary" id="x_lower_boundary"
+                                      title="Нижняя граница по оси X" value="-10">
                             </div>
                             <div>
                                 <label for="x_upper_boundary">Верхняя граница по оси X</label>
-                                <input type="text" name="x_upper_boundary" id="x_upper_boundary" title="Верхняя граница по оси X" value="10">
+                                <input type="text" name="x_upper_boundary" id="x_upper_boundary"
+                                      title="Верхняя граница по оси X" value="10">
                             </div>
                         </div>
                         <div>
                             <h4>По оси X</h4>
                             <div>
                                 <label for="y_lower_boundary">Нижняя граница по оси Y</label>
-                                <input type="text" name="y_lower_boundary" id="y_lower_boundary" title="Нижняя граница по оси Y" value="-10">
+                                <input type="text" name="y_lower_boundary" id="y_lower_boundary"
+                                      title="Нижняя граница по оси Y" value="-10">
                             </div>
                             <div>
                                 <label for="y_upper_boundary">Верхняя граница по оси Y</label>
-                                <input type="text" name="y_upper_boundary" id="y_upper_boundary" title="Верхняя граница по оси Y" value="10">
+                                <input type="text" name="y_upper_boundary" id="y_upper_boundary"
+                                      title="Верхняя граница по оси Y" value="10">
                             </div>
                         </div>
                     </div>
@@ -71,11 +76,11 @@
                         <h3>Количество узлов</h3>
                         <div>
                             <label for="x_node_count">По оси X</label>
-                            <input type="text" name="x_node_count" id="x_node_count" title="По оси X" value="11">
+                            <input type="text" name="x_node_count" id="x_node_count" title="По оси X" value="7">
                         </div>
                         <div>
                             <label for="y_node_count">По оси Y</label>
-                            <input type="text" name="y_node_count" id="y_node_count" title="По оси Y" value="11">
+                            <input type="text" name="y_node_count" id="y_node_count" title="По оси Y" value="7">
                         </div>
                     </div>
                 </form>
@@ -85,9 +90,16 @@
         </div>
         <script type="application/javascript" src="//rawgithub.com/mrdoob/three.js/master/build/three.min.js"></script>
         <script type="application/javascript" src="//rawgithub.com/josdejong/mathjs/master/math.min.js"></script>
-        <script type="application/javascript" src="//rawgithub.com/andrewplummer/Sugar/master/release/sugar.min.js"></script>
-        <script type="application/javascript" src="//rawgithub.com/Darsain/fpsmeter/master/dist/fpsmeter.min.js"></script>
-        <script type="application/javascript" src="plateau.js"></script>
-        <script type="application/javascript" src="main.js"></script>
+        <script type="application/javascript"
+                src="//rawgithub.com/andrewplummer/Sugar/master/release/sugar.min.js"></script>
+        <script type="application/javascript"
+                src="//rawgithub.com/Darsain/fpsmeter/master/dist/fpsmeter.min.js"></script>
+        <script type="application/javascript" src="./js/extrapolator.js"></script>
+        <script type="application/javascript" src="./js/cubic_spline.js"></script>
+        <script type="application/javascript" src="./js/cubic_interpolant.js"></script>
+        <script type="application/javascript" src="./js/bicubic_surface.js"></script>
+        <script type="application/javascript" src="./js/bicubic_interpolant.js"></script>
+        <script type="application/javascript" src="./js/plateau.js"></script>
+        <script type="application/javascript" src="./js/main.js"></script>
     </body>
 </html>
