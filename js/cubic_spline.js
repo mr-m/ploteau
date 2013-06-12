@@ -2,59 +2,60 @@ function CubicSpline (nodes) {
     var self = this;
 
     self.Build = function (nodes) {
-        var segments = self.segments = [];
+        self.Initialize(nodes);
 
-        var nodes_count = nodes.length;
-        var segments_count = nodes_count - 3;
+        var segments = self.segments;
+        var nodes_count = self.nodes_count;
+        var segments_count = self.segments_count;
 
         if (false) {
-        // Инициализация массива сплайнов
-        for (var i = 0; i < nodes_count; ++i)
-        {
-            segments[i] = new CubicSegment();
-        }
+            // Инициализация массива сплайнов
+            for (var i = 0; i < nodes_count; ++i)
+            {
+                segments[i] = new CubicSegment();
+            }
 
-        for (var i = 0; i < nodes_count; ++i)
-        {
-            segments[i].x = nodes[i].x;
-            segments[i].a = nodes[i].y;
-        }
+            for (var i = 0; i < nodes_count; ++i)
+            {
+                segments[i].x = nodes[i].x;
+                segments[i].a = nodes[i].y;
+            }
 
-        segments[0].c = segments[nodes_count - 1].c = 0.0;
+            segments[0].c = segments[nodes_count - 1].c = 0.0;
 
-        // Решение СЛАУ относительно коэффициентов сплайнов c[i] методом прогонки для трехдиагональных матриц
-        // Вычисление прогоночных коэффициентов - прямой ход метода прогонки
-        var alpha = new Array(nodes_count);
-        var beta  = new Array(nodes_count);
+            // Решение СЛАУ относительно коэффициентов сплайнов c[i] методом прогонки для трехдиагональных матриц
+            // Вычисление прогоночных коэффициентов - прямой ход метода прогонки
+            var alpha = new Array(nodes_count);
+            var beta  = new Array(nodes_count);
 
-        alpha[0] = beta[0] = 0.0;
+            alpha[0] = beta[0] = 0.0;
 
-        for (var i = 1; i < nodes_count - 1; ++i)
-        {
-            var hi  = nodes[i].x - nodes[i - 1].x;
-            var hi1 = nodes[i + 1].x - nodes[i].x;
-            var A = hi;
-            var C = 2.0 * (hi + hi1);
-            var B = hi1;
-            var F = 6.0 * ((nodes[i + 1].y - nodes[i].y) / hi1 - (nodes[i].y - nodes[i - 1].y) / hi);
-            var z = (A * alpha[i - 1] + C);
-            alpha[i] = -B / z;
-            beta[i] = (F - A * beta[i - 1]) / z;
-        }
+            for (var i = 1; i < nodes_count - 1; ++i)
+            {
+                var hi  = nodes[i].x - nodes[i - 1].x;
+                var hi1 = nodes[i + 1].x - nodes[i].x;
+                var A = hi;
+                var C = 2.0 * (hi + hi1);
+                var B = hi1;
+                var F = 6.0 * ((nodes[i + 1].y - nodes[i].y) / hi1 - (nodes[i].y - nodes[i - 1].y) / hi);
+                var z = (A * alpha[i - 1] + C);
+                alpha[i] = -B / z;
+                beta[i] = (F - A * beta[i - 1]) / z;
+            }
 
-        // Нахождение решения - обратный ход метода прогонки
-        for (var i = nodes_count - 2; i > 0; --i)
-        {
-            segments[i].c = alpha[i] * segments[i + 1].c + beta[i];
-        }
+            // Нахождение решения - обратный ход метода прогонки
+            for (var i = nodes_count - 2; i > 0; --i)
+            {
+                segments[i].c = alpha[i] * segments[i + 1].c + beta[i];
+            }
 
-        // По известным коэффициентам c[i] находим значения b[i] и d[i]
-        for (var i = nodes_count - 1; i > 0; --i)
-        {
-            var hi = nodes[i].x - nodes[i - 1].x;
-            segments[i].d = (segments[i].c - segments[i - 1].c) / hi;
-            segments[i].b = hi * (2.0 * segments[i].c + segments[i - 1].c) / 6.0 + (nodes[i].y - nodes[i - 1].y) / hi;
-        }
+            // По известным коэффициентам c[i] находим значения b[i] и d[i]
+            for (var i = nodes_count - 1; i > 0; --i)
+            {
+                var hi = nodes[i].x - nodes[i - 1].x;
+                segments[i].d = (segments[i].c - segments[i - 1].c) / hi;
+                segments[i].b = hi * (2.0 * segments[i].c + segments[i - 1].c) / 6.0 + (nodes[i].y - nodes[i - 1].y) / hi;
+            }
         } else {
             for (var i = 0; i < segments_count; i++) {
                 var x0 = nodes[i  ].x;
@@ -93,12 +94,17 @@ function CubicSpline (nodes) {
         }
     }
 
-    self.segments = [];
+    self.Initialize = function (nodes) {
+        self.nodes = nodes;
+
+        var segments = self.segments = [];
+        var nodes_count = self.nodes_count = nodes.length;
+        var segments_count = self.segments_count = nodes_count - 3;
+    }
 
     if (typeof nodes !== 'undefined')
     {
-        self.nodes = nodes;
-        self.Build(self.nodes);
+        self.Build(nodes);
     }
 
     // Вычисление значения интерполированной функции в произвольной точке
