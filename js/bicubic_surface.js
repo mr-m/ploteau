@@ -55,18 +55,27 @@ function BicubicSurface (nodes) {
                 console.groupEnd();
             }
 
+        var cubic_nodes = self.cubic_nodes = [];
+
             for (var i = 0; i < y_nodes_count; i++) {
+            cubic_nodes[i] = [];
+
                 for (var j = 0; j < x_nodes_count; j++) {
-                    p[i][j] = {x: p[i][j].x, y: p[i][j].z};
+                cubic_nodes[i][j] = {x: p[i][j].x, y: p[i][j].z};
+            }
                 }
 
-                self.splines[i] = new CubicSpline(p[i]);
+        for (var i = 0; i < y_nodes_count; i++) {
+            for (var j = 0; j < x_nodes_count; j++) {
+                self.splines[i] = new CubicSpline(cubic_nodes[i]);
             }
         }
     }
 
     if (typeof nodes !== 'undefined') {
         self.nodes = nodes;
+
+        self.cubic_nodes = [];
 
         self.splines = [];
 
