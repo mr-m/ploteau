@@ -113,11 +113,11 @@ function CubicSpline (nodes) {
         var n = segments.length;
         var s = new CubicSegment();
 
-        if (position <= segments[0].x) // Если x меньше точки сетки x[0] - пользуемся первым эл-том массива
+        if (position <= segments[0].x_a) // Если x меньше точки сетки x[0] - пользуемся первым эл-том массива
         {
             s = segments[0];
         }
-        else if (position >= segments[n - 1].x) // Если x больше точки сетки x[n - 1] - пользуемся последним эл-том массива
+        else if (position >= segments[n - 1].x_a) // Если x больше точки сетки x[n - 1] - пользуемся последним эл-том массива
         {
             s = segments[n - 1];
         }

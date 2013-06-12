@@ -52,16 +52,20 @@ function PrintCoordinates (nodes, coordinates) {
     }
 }
 
-function CubicSegment (a, b, c, d, x) {
+function CubicSegment (a, b, c, d, x_a, x_b) {
     if (typeof a === 'undefined') a = 0;
     if (typeof b === 'undefined') b = 0;
     if (typeof c === 'undefined') c = 0;
     if (typeof d === 'undefined') d = 0;
-    if (typeof x === 'undefined') x = 0;
+
+    if (typeof x_a === 'undefined') x_a = 0;
+    if (typeof x_b === 'undefined') x_b = 0;
 
     this.a = a;
     this.b = b;
     this.c = c;
     this.d = d;
-    this.x = x;
+
+    this.x_a = x_a;
+    this.x_b = x_b;
 }
