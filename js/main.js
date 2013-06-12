@@ -37,14 +37,14 @@ var f = function (x, y) { return x + y; }
 
 var random_functions = [
     "cos(x) * cos(y)",
-    "re(asin( (i*x + y)^5 ))",
-    "im(asin( (i*x + y)^5 ))",
-    "re(asin( (i*x + y)^5 )) * im(asin( (i*x + y)^5 ))",
-    "im( (x*y)^(1/4) ) + re( (x*y)^(1/3) )",
+    "re(asin((i*x + y)^5))",
+    "(im(asin((i*x + y)^5))) / 4",
+    "(re(asin((i*x + y)^5)) * im(asin((i*x + y)^5))) / 5",
+    "im((x*y)^(1/4)) + re((x*y)^(1/3))",
     "(5*x*y) / (x^2 + y^2)",
     "(x^2 + y^2) * exp(1 - x^2 - y^2)",
     "cos(x)/y",
-    "cos(pi*0.1*x)*y"
+    "pow(cos(pi*0.2*x)*y, 0.7)"
 ];
 
 var x_coordinates = [];
