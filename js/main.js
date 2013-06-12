@@ -2,6 +2,8 @@ var settings_panel = document.getElementById("settings");
 
 var function_field = document.getElementById("function");
 
+var random = document.getElementById("random");
+
 var plot_type_radio_buttons = document.getElementsByName("plot");
 
 var x_lower_boundary_field = document.getElementById("x_lower_boundary");
@@ -41,7 +43,8 @@ var random_functions = [
     "im( (x*y)^(1/4) ) + re( (x*y)^(1/3) )",
     "(5*x*y) / (x^2 + y^2)",
     "(x^2 + y^2) * exp(1 - x^2 - y^2)",
-    "cos(x)/y"
+    "cos(x)/y",
+    "cos(pi*0.1*x)*y"
 ];
 
 var x_coordinates = [];
@@ -62,36 +65,36 @@ var get_number = function (field) {
 }
 
 var get_function = function (function_string) {
-    console.log("'get_function' called");
+    console.group("'get_function' called");
 
     var str = 'function f(x, y) = ' + function_string;
 
     console.log("string itself: '" + function_string + "'");
-    console.log("string given to the parser: '" + str + "'");
+    console.log("string passed to the parser: '" + str + "'");
 
     var parser = math.parser();
     parser.eval(str);
     var fun = parser.get('f');
 
-    console.log("'get_function' work done");
+    console.groupEnd();
 
     return fun;
 }
 
 var get_title = function (function_string) {
-    console.log("'get_title' called");
+    console.group("'get_title' called");
 
     var title = function_string + ' | plateau';
 
     console.log("new title: '" + title + "'");
 
-    console.log("'get_title' work done");
+    console.groupEnd();
 
     return title;
 }
 
 var get_boundaries = function () {
-    console.log("'get_boundaries' called");
+    console.group("'get_boundaries' called");
 
     x_lower_boundary = get_number(x_lower_boundary_field);
     x_upper_boundary = get_number(x_upper_boundary_field);
@@ -101,11 +104,11 @@ var get_boundaries = function () {
     console.log("x:[" + x_lower_boundary + ", " + x_upper_boundary + "]");
     console.log("y:[" + y_lower_boundary + ", " + y_upper_boundary + "]");
 
-    console.log("'get_boundaries' work done");
+    console.groupEnd();
 }
 
 var get_nodes_count = function () {
-    console.log("'get_nodes_count' called");
+    console.group("'get_nodes_count' called");
 
     x_node_count = get_number(x_node_count_field);
     y_node_count = get_number(y_node_count_field);
@@ -113,11 +116,11 @@ var get_nodes_count = function () {
     console.log("x: " + x_node_count);
     console.log("y: " + y_node_count);
 
-    console.log("'get_nodes_count' work done");
+    console.groupEnd();
 }
 
 var get_nodes = function (lower_boundary, upper_boundary, nodes_count) {
-    console.log("'get_nodes' called");
+    console.group("'get_nodes' called");
 
     var nodes = [];
 
@@ -128,15 +131,15 @@ var get_nodes = function (lower_boundary, upper_boundary, nodes_count) {
         nodes[i] = value;
     };
 
-    // console.log(nodes);
+    console.log("nodes along axis:", nodes);
 
-    console.log("'get_nodes' work done");
+    console.groupEnd();
 
     return nodes;
 }
 
 var get_values = function (x_nodes, y_nodes, fun) {
-    console.log("'get_values' called");
+    console.group("'get_values' called");
 
     var values = [];
 
@@ -157,44 +160,42 @@ var get_values = function (x_nodes, y_nodes, fun) {
         }
     }
 
-    // console.log(values);
+    console.log("computed values matrix");
+    PrintMatrix(values, "z");
 
-    console.log("'get_values' work done");
+    console.groupEnd();
 
     return values;
 }
 
 var A_change = function () {
-    console.log("'A_change' event appeared");
+    console.groupCollapsed("'A_change' event appeared");
 
     get_boundaries();
     get_nodes_count();
 
-    console.log("'A_change' event handler work done");
+    console.groupEnd();
     B_change();
 }
 
 var B_change = function () {
-    console.log("'B_change' event appeared");
+    console.groupCollapsed("'B_change' event");
 
     var function_string = get_value(function_field);
     f = get_function(function_string);
     document.title = get_title(function_string);
 
     x_coordinates = get_nodes(x_lower_boundary, x_upper_boundary, x_node_count);
-    console.log(x_coordinates);
-
     y_coordinates = get_nodes(y_lower_boundary, y_upper_boundary, y_node_count);
-    console.log(y_coordinates);
 
     values = get_values(x_coordinates, y_coordinates, f);
 
-    console.log("'B_change' event handler work done");
+    console.groupEnd();
     C_change();
 }
 
 var C_change = function () {
-    console.log("'C_change' event appeared");
+    console.group("'C_change' event appeared");
 
     particles.dispose();
 
@@ -206,7 +207,7 @@ var C_change = function () {
     particleSystem.rotation.set(axes.rotation.x, axes.rotation.y, axes.rotation.z);
     scene.add(particleSystem);
 
-    console.log(particles);
+    console.log("created particles:", particles);
 
     var type;
 
@@ -216,7 +217,7 @@ var C_change = function () {
         }
     }
 
-    console.log("plot_type:", type);
+    console.log("chosen plot type:", type);
 
     switch (type) {
         default:
@@ -233,7 +234,7 @@ var C_change = function () {
 
     particles.vertices.add(interpolant.Build(values));
 
-    console.log("'C_change' event handler work done");
+    console.groupEnd();
 }
 
 x_lower_boundary_field.addEventListener("change", A_change);
@@ -245,6 +246,16 @@ x_node_count_field.addEventListener("change", A_change);
 y_node_count_field.addEventListener("change", A_change);
 
 function_field.addEventListener("change", B_change);
+
+random.addEventListener("click", function () {
+    var index = Math.random() * random_functions.length | 0;
+
+    console.log("index:", index);
+
+    function_field.value = random_functions[index];
+
+    B_change();
+});
 
 for (var i = 0; i < plot_type_radio_buttons.length; i++) {
     plot_type_radio_buttons[i].addEventListener("change", C_change);
