@@ -28,7 +28,12 @@ function CubicSpline (nodes) {
 
             var M_ = math.inv(M);
 
-            var y = math.matrix([[y0], [y1], [y2], [y3]]);
+            var y = math.matrix([
+                [y0],
+                [y1],
+                [y2],
+                [y3]
+            ]);
 
             var a = math.multiply(M_, y);
 
