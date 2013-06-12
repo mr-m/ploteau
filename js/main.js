@@ -6,13 +6,17 @@ var random = document.getElementById("random");
 
 var plot_type_radio_buttons = document.getElementsByName("plot");
 
-var x_lower_boundary_field = document.getElementById("x_lower_boundary");
-var x_upper_boundary_field = document.getElementById("x_upper_boundary");
-var y_lower_boundary_field = document.getElementById("y_lower_boundary");
-var y_upper_boundary_field = document.getElementById("y_upper_boundary");
+var all_lower_boundary_field = document.getElementById("all_lower_boundary");
+var   x_lower_boundary_field = document.getElementById(  "x_lower_boundary");
+var   y_lower_boundary_field = document.getElementById(  "y_lower_boundary");
 
-var x_node_count_field = document.getElementById("x_node_count");
-var y_node_count_field = document.getElementById("y_node_count");
+var all_upper_boundary_field = document.getElementById("all_upper_boundary");
+var   x_upper_boundary_field = document.getElementById(  "x_upper_boundary");
+var   y_upper_boundary_field = document.getElementById(  "y_upper_boundary");
+
+var all_node_count_field = document.getElementById("all_node_count");
+var   x_node_count_field = document.getElementById(  "x_node_count");
+var   y_node_count_field = document.getElementById(  "y_node_count");
 
 var meter = new FPSMeter(
     settings_panel,
@@ -37,14 +41,14 @@ var f = function (x, y) { return x + y; }
 
 var random_functions = [
     "cos(x) * cos(y)",
-    "re(asin( (i*x + y)^5 ))",
-    "im(asin( (i*x + y)^5 ))",
-    "re(asin( (i*x + y)^5 )) * im(asin( (i*x + y)^5 ))",
-    "im( (x*y)^(1/4) ) + re( (x*y)^(1/3) )",
+    "re(asin((i*x + y)^5))",
+    "(im(asin((i*x + y)^5))) / 4",
+    "(re(asin((i*x + y)^5)) * im(asin((i*x + y)^5))) / 5",
+    "im((x*y)^(1/4)) + re((x*y)^(1/3))",
     "(5*x*y) / (x^2 + y^2)",
     "(x^2 + y^2) * exp(1 - x^2 - y^2)",
     "cos(x)/y",
-    "cos(pi*0.1*x)*y"
+    "pow(cos(pi*0.2*x)*y, 0.7)"
 ];
 
 var x_coordinates = [];
@@ -67,7 +71,7 @@ var get_number = function (field) {
 var get_function = function (function_string) {
     console.group("'get_function' called");
 
-    var str = 'function f(x, y) = ' + function_string;
+    var str = 'function f(x, y) = re(' + function_string + ')';
 
     console.log("string itself: '" + function_string + "'");
     console.log("string passed to the parser: '" + str + "'");
@@ -96,10 +100,19 @@ var get_title = function (function_string) {
 var get_boundaries = function () {
     console.group("'get_boundaries' called");
 
-    x_lower_boundary = get_number(x_lower_boundary_field);
-    x_upper_boundary = get_number(x_upper_boundary_field);
-    y_lower_boundary = get_number(y_lower_boundary_field);
-    y_upper_boundary = get_number(y_upper_boundary_field);
+      x_lower_boundary = get_number(  x_lower_boundary_field);
+      y_lower_boundary = get_number(  y_lower_boundary_field);
+    all_lower_boundary = get_number(all_lower_boundary_field);
+
+      x_upper_boundary = get_number(  x_upper_boundary_field);
+      y_upper_boundary = get_number(  y_upper_boundary_field);
+    all_upper_boundary = get_number(all_upper_boundary_field);
+
+    x_lower_boundary = all_lower_boundary;
+    y_lower_boundary = all_lower_boundary;
+
+    x_upper_boundary = all_upper_boundary;
+    y_upper_boundary = all_upper_boundary;
 
     console.log("x:[" + x_lower_boundary + ", " + x_upper_boundary + "]");
     console.log("y:[" + y_lower_boundary + ", " + y_upper_boundary + "]");
@@ -112,6 +125,11 @@ var get_nodes_count = function () {
 
     x_node_count = get_number(x_node_count_field);
     y_node_count = get_number(y_node_count_field);
+
+    all_node_count = get_number(all_node_count_field);
+
+    x_node_count = all_node_count;
+    y_node_count = all_node_count;
 
     console.log("x: " + x_node_count);
     console.log("y: " + y_node_count);
@@ -169,6 +187,7 @@ var get_values = function (x_nodes, y_nodes, fun) {
 }
 
 var A_change = function () {
+    console.clear();
     console.groupCollapsed("'A_change' event appeared");
 
     get_boundaries();
@@ -197,14 +216,13 @@ var B_change = function () {
 var C_change = function () {
     console.group("'C_change' event appeared");
 
-    particles.dispose();
-
     scene.remove(particleSystem);
 
     particles = new THREE.Geometry();
     particleSystem = new THREE.ParticleSystem(particles, material);
 
     particleSystem.rotation.set(axes.rotation.x, axes.rotation.y, axes.rotation.z);
+
     scene.add(particleSystem);
 
     console.log("created particles:", particles);
@@ -237,13 +255,17 @@ var C_change = function () {
     console.groupEnd();
 }
 
-x_lower_boundary_field.addEventListener("change", A_change);
-x_upper_boundary_field.addEventListener("change", A_change);
-y_lower_boundary_field.addEventListener("change", A_change);
-y_upper_boundary_field.addEventListener("change", A_change);
+all_lower_boundary_field.addEventListener("change", A_change);
+  x_lower_boundary_field.addEventListener("change", A_change);
+  y_lower_boundary_field.addEventListener("change", A_change);
 
-x_node_count_field.addEventListener("change", A_change);
-y_node_count_field.addEventListener("change", A_change);
+all_upper_boundary_field.addEventListener("change", A_change);
+  x_upper_boundary_field.addEventListener("change", A_change);
+  y_upper_boundary_field.addEventListener("change", A_change);
+
+all_node_count_field.addEventListener("change", A_change);
+  x_node_count_field.addEventListener("change", A_change);
+  y_node_count_field.addEventListener("change", A_change);
 
 function_field.addEventListener("change", B_change);
 
