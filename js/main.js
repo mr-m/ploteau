@@ -2,6 +2,8 @@ var settings_panel = document.getElementById("settings");
 
 var function_field = document.getElementById("function");
 
+var random = document.getElementById("random");
+
 var plot_type_radio_buttons = document.getElementsByName("plot");
 
 var x_lower_boundary_field = document.getElementById("x_lower_boundary");
@@ -244,6 +246,16 @@ x_node_count_field.addEventListener("change", A_change);
 y_node_count_field.addEventListener("change", A_change);
 
 function_field.addEventListener("change", B_change);
+
+random.addEventListener("click", function () {
+    var index = Math.random() * random_functions.length | 0;
+
+    console.log("index:", index);
+
+    function_field.value = random_functions[index];
+
+    B_change();
+});
 
 for (var i = 0; i < plot_type_radio_buttons.length; i++) {
     plot_type_radio_buttons[i].addEventListener("change", C_change);
