@@ -8,89 +8,39 @@ function CubicSpline (nodes) {
         var nodes_count = self.nodes_count;
         var segments_count = self.segments_count;
 
-        if (false) {
-            // Инициализация массива сплайнов
-            for (var i = 0; i < nodes_count; ++i)
-            {
-                segments[i] = new CubicSegment();
-            }
+        for (var i = 0; i < segments_count; i++) {
+            var x0 = nodes[i  ].x;
+            var x1 = nodes[i+1].x;
+            var x2 = nodes[i+2].x;
+            var x3 = nodes[i+3].x;
 
-            for (var i = 0; i < nodes_count; ++i)
-            {
-                segments[i].x = nodes[i].x;
-                segments[i].a = nodes[i].y;
-            }
+            var y0 = nodes[i  ].y;
+            var y1 = nodes[i+1].y;
+            var y2 = nodes[i+2].y;
+            var y3 = nodes[i+3].y;
 
-            segments[0].c = segments[nodes_count - 1].c = 0.0;
+            var M = math.matrix([
+                [1, x0, math.pow(x0, 2), math.pow(x0, 3)],
+                [1, x1, math.pow(x1, 2), math.pow(x1, 3)],
+                [1, x2, math.pow(x2, 2), math.pow(x2, 3)],
+                [1, x3, math.pow(x3, 2), math.pow(x3, 3)]
+            ]);
 
-            // Решение СЛАУ относительно коэффициентов сплайнов c[i] методом прогонки для трехдиагональных матриц
-            // Вычисление прогоночных коэффициентов - прямой ход метода прогонки
-            var alpha = new Array(nodes_count);
-            var beta  = new Array(nodes_count);
+            var M_ = math.inv(M);
 
-            alpha[0] = beta[0] = 0.0;
+            var y = math.matrix([[y0], [y1], [y2], [y3]]);
 
-            for (var i = 1; i < nodes_count - 1; ++i)
-            {
-                var hi  = nodes[i].x - nodes[i - 1].x;
-                var hi1 = nodes[i + 1].x - nodes[i].x;
-                var A = hi;
-                var C = 2.0 * (hi + hi1);
-                var B = hi1;
-                var F = 6.0 * ((nodes[i + 1].y - nodes[i].y) / hi1 - (nodes[i].y - nodes[i - 1].y) / hi);
-                var z = (A * alpha[i - 1] + C);
-                alpha[i] = -B / z;
-                beta[i] = (F - A * beta[i - 1]) / z;
-            }
+            var a = math.multiply(M_, y);
 
-            // Нахождение решения - обратный ход метода прогонки
-            for (var i = nodes_count - 2; i > 0; --i)
-            {
-                segments[i].c = alpha[i] * segments[i + 1].c + beta[i];
-            }
+            segments[i] = new CubicSegment();
 
-            // По известным коэффициентам c[i] находим значения b[i] и d[i]
-            for (var i = nodes_count - 1; i > 0; --i)
-            {
-                var hi = nodes[i].x - nodes[i - 1].x;
-                segments[i].d = (segments[i].c - segments[i - 1].c) / hi;
-                segments[i].b = hi * (2.0 * segments[i].c + segments[i - 1].c) / 6.0 + (nodes[i].y - nodes[i - 1].y) / hi;
-            }
-        } else {
-            for (var i = 0; i < segments_count; i++) {
-                var x0 = nodes[i  ].x;
-                var x1 = nodes[i+1].x;
-                var x2 = nodes[i+2].x;
-                var x3 = nodes[i+3].x;
+            segments[i].a = a._data[0][0];
+            segments[i].b = a._data[1][0];
+            segments[i].c = a._data[2][0];
+            segments[i].d = a._data[3][0];
 
-                var y0 = nodes[i  ].y;
-                var y1 = nodes[i+1].y;
-                var y2 = nodes[i+2].y;
-                var y3 = nodes[i+3].y;
-
-                var M = math.matrix([
-                    [1, x0, math.pow(x0, 2), math.pow(x0, 3)],
-                    [1, x1, math.pow(x1, 2), math.pow(x1, 3)],
-                    [1, x2, math.pow(x2, 2), math.pow(x2, 3)],
-                    [1, x3, math.pow(x3, 2), math.pow(x3, 3)]
-                ]);
-
-                var M_ = math.inv(M);
-
-                var y = math.matrix([[y0], [y1], [y2], [y3]]);
-
-                var a = math.multiply(M_, y);
-
-                segments[i] = new CubicSegment();
-
-                segments[i].a = a._data[0][0];
-                segments[i].b = a._data[1][0];
-                segments[i].c = a._data[2][0];
-                segments[i].d = a._data[3][0];
-
-                segments[i].x_a = x1;
-                segments[i].x_b = x2;
-            }
+            segments[i].x_a = x1;
+            segments[i].x_b = x2;
         }
     }
 
