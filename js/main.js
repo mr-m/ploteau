@@ -169,6 +169,7 @@ var get_values = function (x_nodes, y_nodes, fun) {
 }
 
 var A_change = function () {
+    console.clear();
     console.groupCollapsed("'A_change' event appeared");
 
     get_boundaries();
@@ -197,14 +198,13 @@ var B_change = function () {
 var C_change = function () {
     console.group("'C_change' event appeared");
 
-    particles.dispose();
-
     scene.remove(particleSystem);
 
     particles = new THREE.Geometry();
     particleSystem = new THREE.ParticleSystem(particles, material);
 
     particleSystem.rotation.set(axes.rotation.x, axes.rotation.y, axes.rotation.z);
+
     scene.add(particleSystem);
 
     console.log("created particles:", particles);
