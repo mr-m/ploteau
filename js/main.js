@@ -67,7 +67,7 @@ var get_number = function (field) {
 var get_function = function (function_string) {
     console.group("'get_function' called");
 
-    var str = 'function f(x, y) = ' + function_string;
+    var str = 'function f(x, y) = re(' + function_string + ')';
 
     console.log("string itself: '" + function_string + "'");
     console.log("string passed to the parser: '" + str + "'");
