@@ -6,13 +6,17 @@ var random = document.getElementById("random");
 
 var plot_type_radio_buttons = document.getElementsByName("plot");
 
-var x_lower_boundary_field = document.getElementById("x_lower_boundary");
-var x_upper_boundary_field = document.getElementById("x_upper_boundary");
-var y_lower_boundary_field = document.getElementById("y_lower_boundary");
-var y_upper_boundary_field = document.getElementById("y_upper_boundary");
+var all_lower_boundary_field = document.getElementById("all_lower_boundary");
+var   x_lower_boundary_field = document.getElementById(  "x_lower_boundary");
+var   y_lower_boundary_field = document.getElementById(  "y_lower_boundary");
 
-var x_node_count_field = document.getElementById("x_node_count");
-var y_node_count_field = document.getElementById("y_node_count");
+var all_upper_boundary_field = document.getElementById("all_upper_boundary");
+var   x_upper_boundary_field = document.getElementById(  "x_upper_boundary");
+var   y_upper_boundary_field = document.getElementById(  "y_upper_boundary");
+
+var all_node_count_field = document.getElementById("all_node_count");
+var   x_node_count_field = document.getElementById(  "x_node_count");
+var   y_node_count_field = document.getElementById(  "y_node_count");
 
 var meter = new FPSMeter(
     settings_panel,
@@ -96,10 +100,19 @@ var get_title = function (function_string) {
 var get_boundaries = function () {
     console.group("'get_boundaries' called");
 
-    x_lower_boundary = get_number(x_lower_boundary_field);
-    x_upper_boundary = get_number(x_upper_boundary_field);
-    y_lower_boundary = get_number(y_lower_boundary_field);
-    y_upper_boundary = get_number(y_upper_boundary_field);
+      x_lower_boundary = get_number(  x_lower_boundary_field);
+      y_lower_boundary = get_number(  y_lower_boundary_field);
+    all_lower_boundary = get_number(all_lower_boundary_field);
+
+      x_upper_boundary = get_number(  x_upper_boundary_field);
+      y_upper_boundary = get_number(  y_upper_boundary_field);
+    all_upper_boundary = get_number(all_upper_boundary_field);
+
+    x_lower_boundary = all_lower_boundary;
+    y_lower_boundary = all_lower_boundary;
+
+    x_upper_boundary = all_upper_boundary;
+    y_upper_boundary = all_upper_boundary;
 
     console.log("x:[" + x_lower_boundary + ", " + x_upper_boundary + "]");
     console.log("y:[" + y_lower_boundary + ", " + y_upper_boundary + "]");
@@ -112,6 +125,11 @@ var get_nodes_count = function () {
 
     x_node_count = get_number(x_node_count_field);
     y_node_count = get_number(y_node_count_field);
+
+    all_node_count = get_number(all_node_count_field);
+
+    x_node_count = all_node_count;
+    y_node_count = all_node_count;
 
     console.log("x: " + x_node_count);
     console.log("y: " + y_node_count);
@@ -237,13 +255,17 @@ var C_change = function () {
     console.groupEnd();
 }
 
-x_lower_boundary_field.addEventListener("change", A_change);
-x_upper_boundary_field.addEventListener("change", A_change);
-y_lower_boundary_field.addEventListener("change", A_change);
-y_upper_boundary_field.addEventListener("change", A_change);
+all_lower_boundary_field.addEventListener("change", A_change);
+  x_lower_boundary_field.addEventListener("change", A_change);
+  y_lower_boundary_field.addEventListener("change", A_change);
 
-x_node_count_field.addEventListener("change", A_change);
-y_node_count_field.addEventListener("change", A_change);
+all_upper_boundary_field.addEventListener("change", A_change);
+  x_upper_boundary_field.addEventListener("change", A_change);
+  y_upper_boundary_field.addEventListener("change", A_change);
+
+all_node_count_field.addEventListener("change", A_change);
+  x_node_count_field.addEventListener("change", A_change);
+  y_node_count_field.addEventListener("change", A_change);
 
 function_field.addEventListener("change", B_change);
 

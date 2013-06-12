@@ -15,7 +15,7 @@
                         <input type="text" name="function" id="function" value="cos(x) * cos(y)">
                         <input type="button" name="random" id="random" value="&#8635;">
                     </div>
-                    <div>
+                    <div style="display: none;">
                         <h3>Тип графика</h3>
                         <div>
                             <input type="radio" name="plot" value="cubic" id="cubic">
@@ -46,6 +46,18 @@
                     <div>
                         <h3>Границы построения</h3>
                         <div>
+                            <div>
+                                <label for="all_lower_boundary">Нижняя граница</label>
+                                <input type="text" name="all_lower_boundary" id="all_lower_boundary"
+                                      title="Нижняя граница" value="-10">
+                            </div>
+                            <div>
+                                <label for="all_upper_boundary">Верхняя граница</label>
+                                <input type="text" name="all_upper_boundary" id="all_upper_boundary"
+                                      title="Верхняя граница" value="10">
+                            </div>
+                        </div>
+                        <div style="display: none;">
                             <h4>По оси X</h4>
                             <div>
                                 <label for="x_lower_boundary">Нижняя граница по оси X</label>
@@ -58,7 +70,7 @@
                                       title="Верхняя граница по оси X" value="10">
                             </div>
                         </div>
-                        <div>
+                        <div style="display: none;">
                             <h4>По оси X</h4>
                             <div>
                                 <label for="y_lower_boundary">Нижняя граница по оси Y</label>
@@ -75,10 +87,14 @@
                     <div>
                         <h3>Количество узлов</h3>
                         <div>
+                            <label for="all_node_count">По каждой оси</label>
+                            <input type="text" name="all_node_count" id="all_node_count" title="По каждой оси" value="7">
+                        </div>
+                        <div style="display: none;">
                             <label for="x_node_count">По оси X</label>
                             <input type="text" name="x_node_count" id="x_node_count" title="По оси X" value="7">
                         </div>
-                        <div>
+                        <div style="display: none;">
                             <label for="y_node_count">По оси Y</label>
                             <input type="text" name="y_node_count" id="y_node_count" title="По оси Y" value="7">
                         </div>
