@@ -221,6 +221,8 @@ var C_change = function () {
     for (var i = 0; i < plot_type_radio_buttons.length; ++i) {
         if (plot_type_radio_buttons[i].checked) {
             type = plot_type_radio_buttons[i].value;
+
+            break;
         }
     }
 
@@ -340,7 +342,7 @@ var light = new THREE.SpotLight();
 light.position.set(10, 10, 10);
 scene.add(light);
 
-var axes = new THREE.AxisHelper(10);
+var axes = new THREE.AxisHelper(4);
 scene.add(axes);
 
 var down = false;
