@@ -150,7 +150,7 @@ function BicubicInterpolant (nodes) {
 
                 var z = surface.Interpolate(x, y);
 
-                var particle = new THREE.Vector3(x, y, z);
+                var particle = {x: x, y: y, z: z};
 
                 vertices.push(particle);
 

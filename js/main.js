@@ -216,22 +216,13 @@ var B_change = function () {
 var C_change = function () {
     console.group("'C_change' event appeared");
 
-    scene.remove(particleSystem);
-
-    particles = new THREE.Geometry();
-    particleSystem = new THREE.ParticleSystem(particles, material);
-
-    particleSystem.rotation.set(axes.rotation.x, axes.rotation.y, axes.rotation.z);
-
-    scene.add(particleSystem);
-
-    console.log("created particles:", particles);
-
     var type;
 
     for (var i = 0; i < plot_type_radio_buttons.length; ++i) {
         if (plot_type_radio_buttons[i].checked) {
             type = plot_type_radio_buttons[i].value;
+
+            break;
         }
     }
 
@@ -250,7 +241,53 @@ var C_change = function () {
         break;
     }
 
-    particles.vertices.add(interpolant.Build(values));
+    var vertices = interpolant.Build(values);
+
+    var grouped = vertices.inGroups(Math.sqrt(vertices.length));
+
+    var y_length = grouped.length;
+    var x_length = grouped[0].length;
+
+    console.log(y_length, x_length);
+
+    geometry = new THREE.Geometry();
+
+    for (var i = 0; i < y_length; i++) {
+        for (var j = 0; j < x_length; j++) {
+            var v1 = grouped[i][j];
+
+            var vertex1 = new THREE.Vector3(v1.x, v1.y, v1.z);
+
+            geometry.vertices.add(vertex1);
+        }
+    }
+
+    for (var i = 0; i < y_length - 1; i++) {
+        for (var j = 0;  j < x_length - 1; j++) {
+            var v1 = x_length *  j    +  i;
+            var v2 = x_length *  j    + (i+1);
+            var v3 = x_length * (j+1) +  i;
+            var v4 = x_length * (j+1) + (i+1);
+
+            console.log(v1, v2, v3, v4);
+
+            geometry.faces.push(new THREE.Face3(v1, v2, v4));
+            geometry.faces.push(new THREE.Face3(v1, v4, v3));
+        }
+    }
+
+    geometry.computeVertexNormals();
+    geometry.computeFaceNormals();
+
+    console.log("created geometry:", geometry);
+
+    scene.remove(object_model);
+
+    object_model = new THREE.Mesh(geometry, material);
+
+    object_model.rotation.set(axes.rotation.x, axes.rotation.y, axes.rotation.z);
+
+    scene.add(object_model);
 
     console.groupEnd();
 }
@@ -305,27 +342,23 @@ var light = new THREE.SpotLight();
 light.position.set(10, 10, 10);
 scene.add(light);
 
-var axes = new THREE.AxisHelper(10);
+var axes = new THREE.AxisHelper(4);
 scene.add(axes);
-
-// create the particle variables
-var particles = new THREE.Geometry();
-var material = new THREE.ParticleBasicMaterial({
-    color: 0xFFAAAA,
-    size: 0.1,
-    transparent: true
-});
-
-// create the particle system
-var particleSystem = new THREE.ParticleSystem(particles, material);
-
-particleSystem.sortParticles = true;
-
-// add it to the scene
-scene.add(particleSystem);
 
 var down = false;
 var sx = 0, sy = 0;
+
+{
+    var material = new THREE.MeshNormalMaterial({
+        color: 0xFFAAAA,
+        wireframe: false,
+        side: THREE.DoubleSide,
+    });
+
+    var geometry = new THREE.Geometry();
+
+    var object_model = new THREE.Mesh(geometry, material);
+}
 
 renderer.domElement.onmousedown = function (ev) {
     down = true;
@@ -366,7 +399,7 @@ function camera_move (x, y) {
         var dx = x - sx;
         var dy = y - sy;
 
-        particleSystem.rotation.z += dx * 0.01;
+        object_model.rotation.z += dx * 0.01;
         axes.rotation.z += dx * 0.01;
 
         var new_angle = axes.rotation.x + dy * 0.01;
@@ -379,7 +412,7 @@ function camera_move (x, y) {
             new_angle = -math.pi;
         }
 
-        particleSystem.rotation.x = axes.rotation.x = new_angle;
+        object_model.rotation.x = axes.rotation.x = new_angle;
 
         sx += dx;
         sy += dy;
