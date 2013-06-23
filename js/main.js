@@ -420,6 +420,14 @@ function camera_move (x, y) {
 }
 
 function render() {
+    var height = document.documentElement.clientHeight;
+    var width = document.documentElement.clientWidth;
+
+    renderer.setSize(width, height);
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
     requestAnimationFrame(render);
     renderer.render(scene, camera);
     meter.tick();

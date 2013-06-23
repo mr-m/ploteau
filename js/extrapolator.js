@@ -1,4 +1,6 @@
-function Extrapolate (nodes) {
+function Extrapolate (nodes, depth) {
+    var depth = (typeof depth === 'undefined') ? 1 : depth;
+
     console.groupCollapsed("Extrapolation process started");
 
     var watch_coordinate = "z";
@@ -9,8 +11,8 @@ function Extrapolate (nodes) {
     var countY = nodes.length;
     var countX = nodes[0].length;
 
-    var countY_extra = countY + 2;
-    var countX_extra = countX + 2;
+    var countY_extra = countY + 2 * depth;
+    var countX_extra = countX + 2 * depth;
 
     console.log("Initial nodes (y * x): " + countY + " * " + countX);
     console.log("Extrapolated nodes (y * x): " + countY_extra + " * " + countX_extra);
