@@ -9,43 +9,42 @@ function CubicSpline (nodes) {
         var segments_count = self.segments_count;
 
         for (var i = 0; i < segments_count; i++) {
-            var x0 = nodes[i  ].x;
-            var x1 = nodes[i+1].x;
-            var x2 = nodes[i+2].x;
-            var x3 = nodes[i+3].x;
+            var xa = nodes[i+1].x;
+            var xb = nodes[i+2].x;
 
-            var y0 = nodes[i  ].y;
-            var y1 = nodes[i+1].y;
-            var y2 = nodes[i+2].y;
-            var y3 = nodes[i+3].y;
+            var ya = nodes[i+1].y;
+            var yb = nodes[i+2].y;
+
+            var ya_ = (yb - nodes[i+0].y) / 2;
+            var yb_ = (nodes[i+3].y - ya) / 2;
 
             var M = math.matrix([
-                [1, x0, math.pow(x0, 2), math.pow(x0, 3)],
-                [1, x1, math.pow(x1, 2), math.pow(x1, 3)],
-                [1, x2, math.pow(x2, 2), math.pow(x2, 3)],
-                [1, x3, math.pow(x3, 2), math.pow(x3, 3)]
+                [math.pow(xa, 3), math.pow(xa, 2), xa, 1],
+                [math.pow(xb, 3), math.pow(xb, 2), xb, 1],
+                [3 * math.pow(xa, 2), 2 * xa, 1, 0],
+                [3 * math.pow(xb, 2), 2 * xb, 1, 0]
             ]);
 
             var M_ = math.inv(M);
 
             var y = math.matrix([
-                [y0],
-                [y1],
-                [y2],
-                [y3]
+                [ya],
+                [yb],
+                [ya_],
+                [yb_]
             ]);
 
             var a = math.multiply(M_, y);
 
             segments[i] = new CubicSegment();
 
-            segments[i].a = a._data[0][0];
-            segments[i].b = a._data[1][0];
-            segments[i].c = a._data[2][0];
-            segments[i].d = a._data[3][0];
+            segments[i].a3 = a._data[0][0];
+            segments[i].a2 = a._data[1][0];
+            segments[i].a1 = a._data[2][0];
+            segments[i].a0 = a._data[3][0];
 
-            segments[i].x_a = x1;
-            segments[i].x_b = x2;
+            segments[i].x_a = xa;
+            segments[i].x_b = xb;
         }
     }
 
@@ -102,13 +101,13 @@ function CubicSpline (nodes) {
             s = segments[j];
         }
 
-        var a = s.a;
-        var b = s.b;
-        var c = s.c;
-        var d = s.d;
+        var a0 = s.a0;
+        var a1 = s.a1;
+        var a2 = s.a2;
+        var a3 = s.a3;
         var x = position;
 
-        var result = a + b*x + c*x*x + d*x*x*x;
+        var result = a0 + a1*x + a2*x*x + a3*x*x*x;
         return result;
     }
 }
