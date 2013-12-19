@@ -1,3 +1,5 @@
+var math = mathjs();
+
 var settings_panel = document.getElementById("settings");
 
 var function_field = document.getElementById("function");
